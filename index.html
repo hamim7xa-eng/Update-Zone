@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <title>Premium Aesthetic Gallery | High-Quality Wallpapers</title>
+    <meta name="description" content="Explore our premium collection of cute, aesthetic, and high-quality wallpapers. Nature, Fashion, Urban, and Travel vibes.">
+    <meta name="keywords" content="Aesthetic Wallpapers, Cute Photos, Premium Gallery, USA Fashion, Nature Photography">
+    <meta name="author" content="MyGallery">
+    <meta property="og:title" content="Premium Aesthetic Gallery ✨">
+    <meta property="og:description" content="Unlock exclusive high-quality images daily.">
+    
+    <link rel="icon" type="image/jpeg" href="https://images.all-free-download.com/images/graphiclarge/android_gallery_logo_6830698.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+	
+	/* 📱 মোবাইল এবং ডেস্কটপ সব ডিভাইসের জন্য সিলেকশন ও লং-প্রেস কপি বন্ধ */
+
+/* ✅ FIX: html dark background — মোবাইলে স্ক্রোল/কীবোর্ডে সাদা ফ্লাশ বন্ধ */
+html {
+    background: #0f2027;
+    overscroll-behavior: none;
+    height: 100%;
+}
+
+body {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+    -webkit-tap-highlight-color: transparent;
+    /* ✅ FIX: মোবাইল স্ক্রোল ও কীবোর্ড ওঠার সময় সাদা দেখানো বন্ধ */
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    min-height: 100%;
+}
+
+
+/* ===== CARD ANIMATION (বাগ ফিক্সড: অ্যানিমেশন মার্জ করা হয়েছে) ===== */
+.card {
+    /* fadeUp এবং floatCard একসাথে দিলে transform ক্র্যাশ করে, তাই floatCard-এ সামান্য ডিলে দেওয়া ভালো */
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    position: relative; 
+    border-radius: 15px; 
+    overflow: hidden; 
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
+    transition: 0.4s;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== IMAGE & VIDEO ZOOM EFFECT ===== */
+.card img, .card video, .card .media-container { 
+    width: 100%; 
+    height: 160px; 
+    object-fit: cover; 
+    cursor: pointer; 
+    transition: .4s; 
+    display: block;
+    background: #000; 
+}
+
+.card:hover img, .card:hover video { 
+    transform: scale(1.08); 
+}
+
+/* ===== GLOW ANIMATION ===== */
+.card:hover { box-shadow: 0 0 25px #00ffcc; }
+
+/* ===== CUSTOM SCROLLBAR ===== */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-track { background: #111; }
+::-webkit-scrollbar-thumb { background: #00ffcc; border-radius: 20px; }
+
+/* ===== FLOATING EFFECT ===== */
+@keyframes floatCard {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ===== TITLE GLOW ===== */
+
+@keyframes titleGlow {
+    from { text-shadow: 0 0 10px #00ffcc; }
+    to { text-shadow: 0 0 25px #00ccff; }
+}
+
+/* ===== SOCIAL ICON ANIMATION ===== */
+
+@keyframes socialFloat {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ===== BUTTON PULSE ===== */
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(0,255,204,0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(0,255,204,0); }
+    100% { box-shadow: 0 0 0 0 rgba(0,255,204,0); }
+}
+
+/* ===== PARTICLE BG FIX ===== */
+#particles-js { position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: -1; }
+
+.popup-actions {
+    position: absolute; bottom: 20px; display: flex; gap: 10px;
+    flex-wrap: wrap; justify-content: center; width: 100%;
+}
+
+.popup-actions button {
+    border: none; padding: 10px 15px; border-radius: 10px; background: #111;
+    color: #00ffcc; border: 1px solid #00ffcc; cursor: pointer; transition: .3s;
+}
+.popup-actions button:hover { background: #00ffcc; color: #000; }
+
+.close-popup-btn {
+    position: absolute; top: 20px; right: 20px; width: 45px; height: 45px;
+    border-radius: 50%; border: none; background: #ff4444; color: #fff;
+    font-size: 22px; cursor: pointer; z-index: 99999;
+}
+
+#promoModal, #adminPanel, #luxuryLoginModal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,.92); display: none; justify-content: center;
+    align-items: center; z-index: 999999; backdrop-filter: blur(10px);
+}
+
+.admin-box {
+    width: 95%; max-width: 420px; background: #111;
+    border: 1px solid #00ffcc; border-radius: 20px; padding: 25px; text-align: center;
+}
+.admin-box input, .admin-box textarea {
+    width: 100%; margin-top: 10px; padding: 12px; border-radius: 10px;
+    border: none; background: #1e1e1e; color: #fff;
+}
+.admin-box button {
+    margin-top: 10px; width: 100%; padding: 12px; border: none;
+    border-radius: 10px; background: #00ffcc; color: #000; font-weight: bold; cursor: pointer;
+}
+
+/* ===== LUXURY ANIMATED RGB LOGIN CARD ===== */
+.rgb-card {
+    position: relative; width: 95%; max-width: 380px; background: #0b0b0b;
+    padding: 30px; border-radius: 20px; text-align: center; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    animation: cardEntrance 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cardEntrance {
+    from { transform: scale(0.3) rotate(15deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+.rgb-card::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent, #00ffcc, #00ccff, #ff007f, #7c3aed, transparent);
+    animation: rotateRGB 4s linear infinite; z-index: 1;
+}
+
+.rgb-card::after {
+    content: ''; position: absolute; inset: 4px; background: #0c0c0c; border-radius: 16px; z-index: 2;
+}
+
+.rgb-content { position: relative; z-index: 3; }
+.rgb-content input {
+    width: 100%; padding: 12px 15px; margin: 12px 0; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; font-size: 15px;
+    transition: 0.3s;
+}
+.rgb-content input:focus { border-color: #00ffcc; background: rgba(255,255,255,0.1); outline: none; box-shadow: 0 0 10px rgba(0,255,204,0.3); }
+
+.rgb-btn {
+    width: 100%; padding: 12px; margin-top: 15px; background: linear-gradient(45deg, #00ffcc, #00ccff);
+    border: none; border-radius: 10px; color: #000; font-weight: bold; font-size: 16px;
+    cursor: pointer; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px;
+}
+.rgb-btn:hover { transform: scale(1.03); filter: brightness(1.2); box-shadow: 0 0 15px #00ffcc; }
+
+@keyframes rotateRGB { 100% { transform: rotate(360deg); } }
+
+.copy-toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #111; color: #00ffcc; border: 1px solid #00ffcc;
+    padding: 10px 20px; border-radius: 10px; display: none; z-index: 999999;
+}
+
+/* ✅ FIX: Header body-র সাথে flush, scroll hide */
+#topUI {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    z-index: 9999;
+    padding: 0;
+    box-sizing: border-box;
+    transition: transform 0.35s ease;
+}
+#topUI.header-hidden { transform: translateY(-100%); }
+.container { margin-top: 10px !important; }
+
+/* =======================================================
+   🌌 ১. আলটিমেট ব্ল্যাক গ্লাস হেডার ও ড্রোন
+======================================================= */
+.header {
+    position: relative;
+    z-index: 99999;
+    padding: 6px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    background: rgba(15, 22, 42, 0.85) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    border-bottom: 2px solid transparent !important;
+    background-image: linear-gradient(rgba(15, 22, 42, 0.85), rgba(15, 22, 42, 0.85)),
+                      linear-gradient(90deg, rgba(255,0,85,0.4), rgba(0,255,204,0.4), rgba(0,114,255,0.4), rgba(255,0,85,0.4)) !important;
+    background-origin: border-box !important;
+    background-clip: padding-box, border-box !important;
+    background-size: 200% 100% !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.cyber-drone { display: none !important; position: absolute; top: 20%; width: 35px; height: 15px; z-index: 5; pointer-events: none; display: flex; flex-direction: column; align-items: center; }
+.drone-body { width: 25px; height: 8px; background: linear-gradient(90deg, #00ffcc, #0072ff); border-radius: 10px; box-shadow: 0 0 10px #00ffcc; position: relative; }
+.drone-body::after { content: ''; position: absolute; right: -2px; top: 2px; width: 4px; height: 4px; background: #ff0055; border-radius: 50%; box-shadow: 0 0 5px #ff0055; }
+.drone-wings { width: 35px; height: 4px; background: rgba(255, 255, 255, 0.4); border-radius: 50%; animation: wingFlutter 0.1s linear infinite; }
+.torch-light { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 140px; height: 75px; background: linear-gradient(180deg, rgba(0, 255, 204, 0.6) 0%, rgba(0, 114, 255, 0.4) 40%, rgba(255, 0, 85, 0.2) 75%, transparent 100%); clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%); animation: torchGlowShift 4s ease-in-out infinite; transform-origin: top center; mix-blend-mode: screen; }
+.drone-left { left: -5%; animation: slowScanLeftToRight 30s ease-in-out infinite; }
+.drone-right { right: -5%; animation: slowScanRightToLeft 30s ease-in-out infinite; }
+
+/* =======================================================
+   🦜 ২. পিওর সিএসএস ভেক্টর পাখি ডিজাইন (🛡️ জেন-ইনডেক্স ফিক্সড)
+======================================================= */
+.birds-container {
+    position: fixed; 
+    inset: 0;
+    pointer-events: none;
+    z-index: 5; /* 👈 বাগ ফিক্স: ৯৯৯৯৯ থেকে কমিয়ে ৫ করা হলো যাতে সাইডবারের নিচে থাকে */
+}
+
+.magic-bird {
+    position: absolute;
+    width: 60px;  
+    height: 40px;
+    opacity: 0;
+    will-change: transform, left, top;
+}
+
+.flying { opacity: 1 !important; animation: birdFloaty 4s infinite ease-in-out; }
+.vector-bird { position: relative; width: 60px; height: 40px; }
+.bird-body { position: absolute; width: 36px; height: 18px; background: linear-gradient(135deg, #00ffcc, #0072ff); border-radius: 50% 50% 30% 30% / 80% 80% 40% 40%; top: 10px; left: 12px; z-index: 2; box-shadow: 0 4px 10px rgba(0, 255, 204, 0.3); }
+.bird-eye { position: absolute; width: 4px; height: 4px; background: #ffffff; border-radius: 50%; top: 4px; right: 8px; }
+.bird-wing { position: absolute; width: 22px; height: 28px; background: rgba(0, 255, 204, 0.9); border-radius: 50% 0% 50% 50% / 50% 0% 50% 50%; z-index: 3; }
+.wing-left { left: 4px; top: -6px; transform-origin: bottom right; animation: flapLeft 0.25s infinite ease-in-out alternate; }
+.wing-right { left: 30px; top: -8px; background: rgba(0, 114, 255, 0.8); border-radius: 0% 50% 50% 50% / 0% 50% 50% 50%; transform-origin: bottom left; z-index: 1; animation: flapRight 0.25s infinite ease-in-out alternate; }
+.bird-tail { position: absolute; left: 0px; top: 15px; width: 0; height: 0; border-top: 5px solid transparent; border-bottom: 5px solid transparent; border-right: 14px solid #0072ff; transform: rotate(15deg); }
+
+/* =======================================================
+   🪶 ৩. আরজিবি নিয়ন পালক ও ব্লাস্ট (🛡️ লেয়ার ফিক্সড)
+======================================================= */
+.rgb-feather {
+    position: fixed; width: 8px; height: 24px;
+    background: linear-gradient(180deg, var(--f-color) 0%, rgba(255,255,255,0.9) 100%);
+    border-radius: 50% 50% 40% 40% / 70% 70% 45% 45%;
+    pointer-events: auto; cursor: pointer;
+    z-index: 4; /* 👈 সাইডবার ও প্যানেলের পেছনে থাকবে */
+    box-shadow: 0 0 12px var(--f-color);
+    animation: featherDropWobble linear forwards;
+}
+
+.rgb-feather::before { content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: rgba(255, 255, 255, 0.5); transform: translateX(-50%); }
+.blast-particle { position: fixed; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; z-index: 6; animation: particleBlast 0.5s ease-out forwards; }
+
+/* =======================================================
+   🔄 ৪. সকল অ্যানিমেশনের কি-ফ্রেম লজিক
+======================================================= */
+@keyframes softRgbMove { 0% { background-position: 0% 0%; } 100% { background-position: -200% 0%; } }
+@keyframes wingFlutter { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.3); } }
+@keyframes torchGlowShift { 0%, 100% { transform: translateX(-50%) rotate(-6deg); filter: hue-rotate(0deg) saturate(2); } 50% { transform: translateX(-50%) rotate(6deg); filter: hue-rotate(180deg) saturate(2); } }
+@keyframes slowScanLeftToRight { 0% { left: 2%; transform: scaleX(1); } 48% { left: 93%; transform: scaleX(1); } 50% { left: 93%; transform: scaleX(-1); } 98% { left: 2%; transform: scaleX(-1); } 100% { left: 2%; transform: scaleX(1); } }
+@keyframes slowScanRightToLeft { 0% { right: 2%; transform: scaleX(1); } 48% { right: 93%; transform: scaleX(1); } 50% { right: 93%; transform: scaleX(-1); } 98% { right: 2%; transform: scaleX(-1); } 100% { right: 2%; transform: scaleX(1); } }
+@keyframes particleBlast { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--mx), var(--my)) scale(0); opacity: 0; } }
+@keyframes flapLeft { 0% { transform: rotate(15deg); } 100% { transform: rotate(-45deg); } }
+@keyframes flapRight { 0% { transform: rotate(-15deg); } 100% { transform: rotate(45deg); } }
+@keyframes birdFloaty { 0%, 100% { margin-left: 0px; } 50% { margin-left: 20px; } }
+@keyframes featherDropWobble {
+    0% { transform: translateY(0) rotate(0deg) translateX(0); opacity: 1; }
+    33% { transform: translateY(35vh) rotate(15deg) translateX(15px); }
+    66% { transform: translateY(70vh) rotate(-15deg) translateX(-15px); }
+    100% { transform: translateY(105vh) rotate(10deg) translateX(2px); opacity: 0; }
+}
+
+.title {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(90deg, #00ffe7, #7c3aed, #ff0080);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+}
+
+.icon-btn {
+    width: 45px; height: 45px; background: rgba(0, 255, 204, 0.1);
+    border: 1px solid #00ffcc; border-radius: 12px; color: #00ffcc;
+    font-size: 20px; cursor: pointer; transition: 0.3s all ease;
+    display: flex; justify-content: center; align-items: center;
+}
+.icon-btn:hover { background: #00ffcc; color: #000; box-shadow: 0 0 20px #00ffcc; transform: scale(1.1); }
+.header .icon-btn { width: 38px; height: 38px; font-size: 17px; border-radius: 10px; }
+
+/* ===== 🛡️ সাইডবার ও নোটিফিকেশন প্যানেল (হাই জেন-ইনডেক্স লকড) ===== */
+#sidebar, #notifPanel {
+    position: fixed; top: 0; height: 100vh; width: 280px;
+    background: rgba(10, 10, 10, 0.98); z-index: 100000; padding: 40px 20px;
+    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); backdrop-filter: blur(25px);
+}
+#sidebar { left: -300px; border-right: 3px solid #00ffcc; }
+#notifPanel { right: -300px; border-left: 3px solid #ffcc00; }
+
+.side-btn {
+    width: 100%; padding: 12px; margin: 10px 0; background: rgba(255,255,255,0.05);
+    border: 1px solid #00ffcc; color: #00ffcc; border-radius: 10px; cursor: pointer;
+    transition: 0.3s; font-weight: bold;
+}
+.side-btn:hover { background: #00ffcc; color: #000; box-shadow: 0 0 15px #00ffcc; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+body {
+    background: linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#000);
+    background-size: 400% 400%; color: #fff; text-align: center; overflow-x: hidden;
+}
+@keyframes bg { 0% { background-position: 0% } 50% { background-position: 100% } 100% { background-position: 0% } }
+
+.filter-buttons { margin: 20px 0; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.filter-btn {
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 8px 20px; color: #fff; border-radius: 20px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s;
+}
+.filter-btn.active, .filter-btn:hover { background: #00ffcc; color: #000; box-shadow: 0 0 15px #00ffcc; }
+
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+
+.caption-bar { padding: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.like-btn-container {
+    display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.08);
+    padding: 4px 10px; border-radius: 20px; cursor: pointer; transition: 0.2s;
+}
+.like-btn-container:hover { background: rgba(255,255,255,0.2); }
+.like-btn-container.liked i { color: #ff4d4d; }
+.like-text { font-size: 13px; color: #ccc; font-weight: 500; }
+
+@keyframes popHeart { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+
+.action-group { display: flex; gap: 10px; width: 100%; }
+.mini-btn {
+    width: 38px; height: 38px; border-radius: 12px; border: none;
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer; color: white; font-size: 16px; transition: 0.3s;
+}
+.btn-copy { background: #00d2ff; }
+.btn-share { background: #7c3aed; }
+.btn-download { background: #ff9800; }
+.mini-btn:hover { transform: scale(1.1); filter: brightness(1.2); }
+
+/* ===== PROFESSIONAL CARD ACTIONS (Unlock + Share + Download) ===== */
+.card { border-radius: 16px; }
+.card .card-info { padding: 14px; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+.card .card-meta { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.card .cat-chip {
+    font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase;
+    color: #9fb4ff; background: rgba(143,160,221,0.12); border: 1px solid rgba(143,160,221,0.22);
+    padding: 4px 10px; border-radius: 999px; max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card .card-actions { display: flex; align-items: center; gap: 8px; width: 100%; }
+.card .unlock-btn {
+    flex: 1; min-width: 0; height: 42px; border: none; border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 14px; font-weight: 700; letter-spacing: .3px; color: #04141a;
+    background: linear-gradient(135deg, #00ffcc, #00b8ff);
+    box-shadow: 0 6px 18px rgba(0,200,255,0.28);
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+}
+.card .unlock-btn:hover { transform: translateY(-1px); filter: brightness(1.08); box-shadow: 0 8px 22px rgba(0,200,255,0.4); }
+.card .unlock-btn:active { transform: translateY(0) scale(.98); }
+.card .unlock-btn.is-open { background: linear-gradient(135deg, #34d399, #10b981); box-shadow: 0 6px 18px rgba(16,185,129,0.28); }
+.card .card-icon-btn {
+    flex: 0 0 42px; width: 42px; height: 42px; border-radius: 12px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 16px; color: #e8eefc;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14);
+    transition: background .2s ease, border-color .2s ease, transform .2s ease, color .2s ease;
+}
+.card .card-icon-btn:hover { transform: translateY(-1px); }
+.card .card-icon-btn.share-btn:hover { background: rgba(124,58,237,0.22); border-color: #7c3aed; color: #c4b5fd; }
+.card .card-icon-btn.dl-btn:hover { background: rgba(255,152,0,0.2); border-color: #ff9800; color: #ffcc80; }
+body.light-mode .card .card-icon-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12); color: #333; }
+
+/* ===== LIGHTER CARDS: no neon glow, no blur, no transitions (smooth on mobile) ===== */
+.card { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; transition: none !important; }
+.card:hover { box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37) !important; }
+.card img, .card video, .card .media-container { transition: none !important; }
+.card .unlock-btn, .card .card-icon-btn { transition: none !important; }
+.card .unlock-btn:hover, .card .card-icon-btn:hover { transform: none; box-shadow: none; }
+/* ===== CARD CAPTION (optional short text under the media) ===== */
+.card .card-text { font-size: 12px; line-height: 1.45; color: #9fb0d0; padding: 0; margin: -2px 0 0; text-align: left; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
+body.light-mode .card .card-text { color: #556; }
+/* ===== CONTENT VIEWER + UNLOCK MODULE ===== */
+.card .locked-thumb { position: relative; width: 100%; height: 160px; cursor: pointer; overflow: hidden; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg,#0d1b2a,#1b2b44); }
+.card .locked-thumb > i.fa-image, .card .locked-thumb > i.fa-circle-play { font-size: 42px; color: rgba(255,255,255,0.35); }
+.card .locked-thumb img, .card .locked-thumb video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.card .locked-thumb .play-badge { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 46px; height: 46px; border-radius: 50%; background: rgba(0,0,0,0.55); border: 1px solid rgba(255,255,255,0.35); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; padding-left: 3px; }
+#shareSheet { position: fixed; inset: 0; z-index: 9500; display: none; align-items: flex-end; justify-content: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+#shareSheet .share-box { width: 100%; max-width: 460px; background: #0e1623; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px 18px 0 0; padding: 18px; display: flex; flex-direction: column; gap: 12px; text-align: left; }
+#shareSheet .share-title { font-weight: 700; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+#shareSheet .share-title button { background: none; border: none; color: #9fb0d0; font-size: 18px; cursor: pointer; }
+#shareSheet input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.14); background: #070b12; color: #cfe; font-size: 13px; }
+#shareSheet .copy-big { height: 44px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; color: #04141a; background: linear-gradient(135deg,#00ffcc,#00b8ff); }
+#shareSheet .share-apps { display: flex; gap: 8px; flex-wrap: wrap; }
+#shareSheet .share-apps a, #shareSheet .share-apps button { flex: 1; min-width: 80px; height: 42px; display: flex; align-items: center; justify-content: center; gap: 6px; border-radius: 12px; font-size: 13px; font-weight: 600; color: #e8eefc; text-decoration: none; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); cursor: pointer; }
+#contentViewer { position: fixed; inset: 0; z-index: 9000; display: none; align-items: center; justify-content: center; background: rgba(4,8,14,0.92); backdrop-filter: blur(8px); padding: 14px; overflow-y: auto; }
+#contentViewer .cv-box { width: 100%; max-width: 560px; background: #0e1623; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.6); text-align: left; }
+#contentViewer .cv-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+#contentViewer .cv-title { font-size: 15px; font-weight: 700; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#contentViewer .cv-close { width: 34px; height: 34px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; flex: 0 0 34px; }
+#contentViewer .cv-stage { position: relative; min-height: 220px; background: #05090f; display: flex; align-items: center; justify-content: center; }
+#contentViewer .cv-stage img, #contentViewer .cv-stage video { width: 100%; max-height: 70vh; object-fit: contain; display: block; }
+#contentViewer .cv-lock { text-align: center; color: #8fa0dd; padding: 30px 16px; }
+#contentViewer .cv-stage img.cv-prev { position: absolute; inset: 0; width: 100%; height: 100%; max-height: none; object-fit: cover; filter: brightness(.45); }
+#contentViewer .cv-lock.over { position: relative; z-index: 1; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,.8); }
+#contentViewer .cv-lock i { font-size: 44px; color: #00ffcc; margin-bottom: 10px; }
+#contentViewer .cv-panel { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+#contentViewer .cv-step { font-size: 15px; font-weight: 700; color: #fff; }
+#contentViewer .cv-bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.1); overflow: hidden; }
+#contentViewer .cv-bar > span { display: block; height: 100%; width: 0; background: linear-gradient(90deg,#00ffcc,#00b8ff); transition: width .4s ease; }
+#contentViewer .cv-msg { font-size: 13px; color: #9fb0d0; min-height: 18px; }
+#contentViewer .cv-msg.err { color: #ff6b81; }
+#contentViewer .cv-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+#contentViewer .cv-btn { flex: 1; min-width: 120px; height: 42px; border: none; border-radius: 12px; font-weight: 700; font-size: 14px; cursor: pointer; color: #04141a; background: linear-gradient(135deg,#00ffcc,#00b8ff); }
+#contentViewer .cv-btn[disabled] { opacity: .5; cursor: not-allowed; }
+#contentViewer .cv-btn.sec { color: #e8eefc; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.14); flex: 0 0 auto; padding: 0 14px; min-width: 0; }
+.priv-badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; background:rgba(255,0,85,.15); color:#ff5c8a; border:1px solid rgba(255,0,85,.4); }
+.adm-mini { padding:5px 10px; margin:2px; font-size:12px; border:none; border-radius:8px; cursor:pointer; font-weight:700; }
+.adm-field { width:100%; padding:10px; background:#070911; border:1px solid #1a2035; border-radius:8px; color:#fff; outline:none; margin-top:5px; }
+body.light-mode .card .cat-chip { color: #3b4fa8; background: rgba(59,79,168,0.08); border-color: rgba(59,79,168,0.2); }
+
+.popup, #downloadModal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+    display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(8px);
+}
+.modal-box { background: #111; padding: 30px; border-radius: 15px; border: 1px solid #00ffcc; text-align: center; }
+.btn { display: inline-block; margin-top: 20px; padding: 12px 25px; border-radius: 30px; background: linear-gradient(45deg,#00ffcc,#00ccff); color: #000; text-decoration: none; font-weight: bold; }
+
+.social { position: fixed; top: 50%; right: 10px; transform: translateY(-50%); z-index: 100; }
+.social a { display: block; margin: 10px 0; font-size: 20px; color: #fff; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 50%; transition: .3s; }
+.social a:hover { color: #00ffcc; box-shadow: 0 0 10px #00ffcc; }
+
+footer { margin-top: 50px; padding: 20px; font-size: 12px; color: #777; border-top: 1px solid rgba(255,255,255,0.1); }
+footer a { color: #00ffcc; text-decoration: none; }
+
+#startPopup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 20000; }
+
+body.light-mode { background: linear-gradient(-45deg, #e0eafc, #cfdef3, #f7f9fc, #ffffff); background-size: 400% 400%; color: #222; }
+body.light-mode .card { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+body.light-mode .caption, body.light-mode p { color: #444; }
+body.light-mode h1 { background: linear-gradient(45deg, #007bff, #00c6ff); -webkit-background-clip: text; }
+body.light-mode .filter-btn { background: rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.1); color: #333; }
+		
+.luxury-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(4, 5, 10, 0.9); backdrop-filter: blur(15px);
+    display: flex; justify-content: center; align-items: center; z-index: 999999; /* 👈 অ্যাডমিন প্যানেল যেন সবার উপরে থাকে */
+    opacity: 0; pointer-events: none; transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.luxury-modal[style*="display: flex"], .luxury-modal.active { opacity: 1 !important; pointer-events: auto !important; }
+
+.luxury-card {
+    background: #06070d; padding: 35px; border-radius: 24px; width: 92%; max-width: 420px; text-align: center; position: relative; border: 2px solid #00f0ff;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.1); transform: scale(0.7) translateY(-50px); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden;
+}
+
+.luxury-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, #ff0055, #00ffcc, #9900ff, #ff0055); animation: rotateRGB 4s linear infinite; z-index: -2; }
+.luxury-card::after { content: ''; position: absolute; inset: 3px; background: #06070d; border-radius: 21px; z-index: -1; }
+.luxury-modal[style*="display: flex"] .luxury-card { transform: scale(1) translateY(0); }
+.luxury-card.exit-success { transform: scale(0.3) rotate(10deg) translateY(500px) !important; opacity: 0; transition: all 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045); }
+.luxury-card.shake-error { animation: neonShake 0.4s ease-in-out !important; border-color: #ff0055 !important; box-shadow: 0 0 40px rgba(255, 0, 85, 0.6) !important; }
+
+.luxury-card h2 { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; background: linear-gradient(45deg, #00f0ff, #ff007f, #00ffcc); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: textRGB 3s linear infinite; margin-bottom: 30px; }
+
+.input-group { position: relative; margin-bottom: 22px; }
+.input-group i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #00f0ff; font-size: 18px; transition: color 0.3s; }
+.input-group input { width: 100%; padding: 15px 15px 15px 50px; background: rgba(22, 25, 34, 0.7); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 12px; color: #fff; font-size: 15px; outline: none; letter-spacing: 0.5px; transition: all 0.3s ease; }
+.input-group input:focus { border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); background: #11141d; }
+.input-group input:focus ~ i { color: #ff007f; }
+
+.luxury-btn { width: 100%; padding: 16px; background: linear-gradient(45deg, #00f0ff, #ff007f); background-size: 200% auto; border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3); }
+.luxury-btn:hover { background-position: right center; box-shadow: 0 0 25px rgba(255, 0, 127, 0.6); transform: translateY(-2px); }
+.luxury-btn:active { transform: translateY(1px); }
+
+@keyframes neonShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+
+/* ==============================================
+   ANIMATIONS DASHBOARD 
+============================================== */
+.vip-dashboard {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #040509; display: flex; z-index: 999999; font-family: 'Segoe UI', Roboto, sans-serif; color: #fff; animation: bootSystem 0.6s cubic-bezier(0.1, 1, 0.1, 1);
+}
+
+.dash-sidebar { width: 320px; background: #070911; border-right: 2px solid #00f0ff; box-shadow: 5px 0 25px rgba(0, 240, 255, 0.15); display: flex; flex-direction: column; padding: 30px 20px; justify-content: space-between; position: relative; }
+.dash-sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 2px; height: 100%; background: linear-gradient(to bottom, #00f0ff, #ff0055, #00ffcc); background-size: 100% 200%; animation: moveGlow 4s linear infinite; }
+
+.admin-profile { text-align: center; margin-bottom: 40px; }
+.avatar-glow { width: 80px; height: 80px; background: radial-gradient(circle, #00f0ff 0%, transparent 70%); border-radius: 50%; border: 2px dashed #ff0055; margin: 0 auto 15px; position: relative; animation: rotateRGB 10s linear infinite; }
+.admin-profile h3 { font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #fff; margin: 0; }
+.admin-profile span { font-size: 11px; color: #ff0055; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+
+.sidebar-menu { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
+.menu-btn { width: 100%; padding: 15px 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(0, 240, 255, 0.1); border-radius: 12px; color: #8fa0dd; font-size: 15px; font-weight: 700; text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 15px; }
+.menu-btn i { font-size: 18px; color: #00f0ff; }
+.menu-btn:hover { background: rgba(0, 240, 255, 0.05); border-color: #ff0055; color: #fff; transform: translateX(5px); box-shadow: -5px 0 10px rgba(255,0,85,0.2); }
+.menu-btn.active { background: linear-gradient(90deg, rgba(0,240,255,0.15) 0%, transparent 100%); border-left: 4px solid #00f0ff; border-color: rgba(0, 240, 255, 0.4); color: #fff; font-weight: 800; }
+
+/* ফিক্সড: ডুপ্লিকেট ক্লাস রিমুভড */
+.font-neon { animation: pulseGlow 2s infinite; color: #ff0055 !important; }
+.font-neon i { color: #ff0055 !important; }
+
+.coming-soon-box h2 { display: inline-block; vertical-align: middle; margin-right: 15px; }
+
+.dev-watermark {
+    font-family: 'Orbitron', 'Poppins', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none !important; display: inline-block; vertical-align: middle; padding: 4px 12px; border-radius: 4px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+    background-image: linear-gradient(90deg, #ff0055, #00ffcc, #0072ff, #ffef00, #ff0055); background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: rgbTextMove 6s linear infinite;
+    transition: all 0.3s ease-in-out; cursor: pointer; position: relative; top: -2px; 
+}
+.dev-watermark:hover { transform: scale(1.08) translateY(-1px); text-shadow: 0 0 10px rgba(0, 255, 204, 0.6), 0 0 20px rgba(255, 0, 85, 0.4); background: rgba(255, 255, 255, 0.08); border-color: rgba(0, 255, 204, 0.4); box-shadow: 0 0 15px rgba(0, 255, 204, 0.1); }
+
+@keyframes rgbTextMove { 0% { background-position: 0% 50%; filter: hue-rotate(0deg); } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; filter: hue-rotate(360deg); } }
+
+.dash-main { flex-grow: 1; height: 100%; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, #0d111e, #040509); }
+.tab-content { display: none; animation: fadeInTab 0.4s ease; }
+.tab-content.active { display: block; }
+.dash-main h2 { font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 15px; }
+.dash-main p { color: #5c6996; margin-top: 0; font-size: 14px; margin-bottom: 30px; }
+
+.vip-zone { background: rgba(11, 14, 26, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+.upload-dropzone { border: 2px dashed rgba(0, 240, 255, 0.3); border-radius: 15px; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.3s; background: rgba(0,0,0,0.2); }
+.upload-dropzone:hover { border-color: #ff0055; background: rgba(255, 0, 85, 0.02); }
+
+.cyber-btn { padding: 14px 28px; background: linear-gradient(45deg, #00f0ff, #0072ff); border: none; border-radius: 10px; color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; width: 100%; margin-top: 20px; }
+.cyber-btn:hover { box-shadow: 0 0 20px rgba(0,240,255,0.5); transform: translateY(-2px); }
+.btn-red { background: linear-gradient(45deg, #ff0055, #990022) !important; }
+.btn-red:hover { box-shadow: 0 0 20px rgba(255,0,85,0.5) !important; }
+
+.input-group-dash { display: flex; flex-direction: column; gap: 8px; }
+.input-group-dash label { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #00f0ff; letter-spacing: 1px;}
+.input-group-dash input, .input-group-dash textarea { width: 100%; padding: 15px; background: #070911; border: 1px solid #1a2035; border-radius: 10px; color: #fff; outline: none; transition: 0.3s; }
+.input-group-dash input:focus, .input-group-dash textarea:focus { border-color: #ff0055; box-shadow: 0 0 10px rgba(255,0,85,0.2); }
+
+.danger-box { border-left: 4px solid #ff0055; background: rgba(255,0,85,0.03); padding: 20px; border-radius: 10px; }
+.cyber-card-inner { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; }
+
+/* কামিং সুন বক্স এবং গ্লিচ ইফেক্ট */
+.coming-soon-box { text-align: center; padding: 60px 20px; }
+.glitch-text {
+    font-size: 65px; font-weight: 900; letter-spacing: 5px; color: #00f0ff;
+    position: relative; animation: pulseGlow 1.5s infinite;
+}
+.loader-bar {
+    width: 250px; height: 4px; background: rgba(255,255,255,0.05); margin: 25px auto; border-radius: 10px; overflow: hidden;
+}
+.loader-bar div { width: 40%; height: 100%; background: #ff0055; animation: infiniteLoad 2s ease infinite; }
+
+/* সেলফ ডেসট্রাক্ট লগআউট */
+.dash-logout {
+    padding: 14px; background: rgba(255,0,85,0.1); border: 1px solid rgba(255,0,85,0.3);
+    border-radius: 10px; color: #ff0055; font-weight: 800; cursor: pointer; transition: 0.3s;
+}
+.dash-logout:hover { background: #ff0055; color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
+
+/* ============================
+   KEYFRAMES (অ্যানিমেশনস)
+============================ */
+@keyframes bootSystem { 0% { opacity: 0; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes fadeInTab { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes moveGlow { 0% { background-position: 0% 0%; } 100% { background-position: 0% 200%; } }
+@keyframes pulseGlow { 0%, 100% { opacity: 0.6; text-shadow: 0 0 5px rgba(255,0,85,0.2); } 50% { opacity: 1; text-shadow: 0 0 15px rgba(255,0,85,0.8); } }
+@keyframes infiniteLoad { 0% { transform: translateX(-150%); } 100% { transform: translateX(250%); } }
+
+.cyber-table th {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+.cyber-table td {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+.badge {
+    background: rgba(0, 240, 255, 0.1);
+    color: #00f0ff;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+}
+
+
+/* 💥 কাস্টম সাইবারপঙ্ক টোস্ট নোটিফিকেশন স্টাইল */
+#cyberToast {
+    position: fixed;
+    bottom: -100px; /* ডিফল্টভাবে স্ক্রিনের বাইরে লুকিয়ে থাকবে */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 15, 30, 0.9);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* পপআপ এনিমেশন */
+}
+
+/* সাকসেস বা পজিটিভ নোটিফিকেশনের জন্য গ্রিন বর্ডার */
+#cyberToast.toast-success {
+    border-color: #00ffcc;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+}
+
+/* এরর বা নেগেটিভ নোটিফিকেশনের জন্য রেড বর্ডার */
+#cyberToast.toast-error {
+    border-color: #ff0055;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+}
+
+
+/* all btn mobail size */
+
+/* ===== MOBILE PERFORMANCE OPTIMIZATIONS ===== */
+@media(max-width:768px){
+    .filter-buttons{
+        display:flex;
+        flex-wrap:nowrap;
+        overflow-x:auto;
+        gap:6px;
+        padding:5px;
+        -webkit-overflow-scrolling: touch;
+    }
+    .filter-btn{
+        font-size:11px;
+        padding:6px 10px;
+        min-width:auto;
+        white-space:nowrap;
+    }
+
+    /* মোবাইলে card float animation বন্ধ — lag fix */
+    .card {
+        will-change: auto;
+    }
+
+    /* মোবাইলে hover zoom বন্ধ */
+    .card:hover img, .card:hover video {
+        transform: none;
+    }
+
+    /* মোবাইলে drone/torch বন্ধ — performance boost */
+    .cyber-drone { display: none !important; }
+
+    /* মোবাইলে header padding ছোট */
+    .header { padding: 5px 10px !important; }
+
+    /* মোবাইলে gallery 2 column */
+    .gallery {
+        grid-template-columns: repeat(1, 1fr) !important;
+        gap: 14px;
+    }
+    .card .media-container, .card .locked-thumb { height: 210px; }
+
+    /* মোবাইলে social icons ছোট */
+    .social a { padding: 7px; font-size: 16px; }
+
+    /* মোবাইলে backdrop-filter simplify */
+    .card { backdrop-filter: none; }
+}
+
+/* মোবাইলে খুব ছোট স্ক্রিন */
+@media(max-width:380px){
+    .gallery { grid-template-columns: repeat(1, 1fr) !important; }
+    .title { font-size: 18px; }
+}
+
+/* =======================================================
+   📢 নোটিফিকেশন প্যানেল লেআউট (ফাইনাল ফিক্সড)
+======================================================= */
+.notif-panel {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 300px;
+    height: 100vh;
+    background: rgba(10, 15, 30, 0.95);
+    backdrop-filter: blur(12px);
+    z-index: 999999;
+    transition: 0.3s ease;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.4);
+    padding: 25px 20px; /* চারপাশের প্যাডিং একটু বাড়ালাম সুন্দর লুকের জন্য */
+    color: white;
+    
+    display: flex;
+    flex-direction: column;
+}
+
+.notif-panel.active {
+    right: 0;
+}
+
+.notif-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+/* 🔄 নোটিফিকেশন লিস্ট এরিয়া */
+.notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto; 
+    /* ⚡ 'max-height' দেওয়ার কারণে নোটিফিকেশন কম থাকলে বাটনটা নিচেই থাকবে, 
+       একেবারে স্ক্রিনের নিচে গিয়ে চিপকে থাকবে না। আর নোটিফিকেশন বাড়লে এখানে স্ক্রোল হবে */
+    max-height: calc(100vh - 150px); 
+    margin-bottom: 20px;
+    padding-right: 5px;
+}
+
+/* স্ক্রোলবার স্টাইল */
+.notif-list::-webkit-scrollbar {
+    width: 4px;
+}
+.notif-list::-webkit-scrollbar-thumb {
+    background: #00ffcc;
+    border-radius: 10px;
+}
+
+.notif-item {
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #00ffcc;
+    font-size: 14px;
+}
+
+/* ❌ মেইন লাল ক্লোজ বাটন স্টাইল (তোর স্ক্রিনশটের মতো ১০০% ম্যাচিং) */
+.notif-close-btn {
+    width: 100% !important;
+    background: #ff4444 !important; /* লাল ব্যাকগ্রাউন্ড */
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 12px !important; 
+    border-radius: 10px !important; /* পারফেক্ট রাউন্ড কর্নার */
+    font-size: 15px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 15px rgba(255, 68, 68, 0.3) !important;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-top: 10px; /* বাটনগুলোর থেকে স্বাভাবিক গ্যাপ */
+    transition: all 0.2s ease-in-out !important;
+}
+
+/* 🖱️ হোভার অ্যানিমেশন ও নিওন গ্লো */
+.notif-close-btn:hover {
+    background: #ff2222 !important; /* মাউস নিলে একটু ডার্ক লাল হবে */
+    transform: scale(1.03) !important; /* হালকা একটু বড় হবে */
+    box-shadow: 0 6px 20px rgba(255, 34, 34, 0.6) !important; /* নিওন রেড গ্লো */
+}
+
+/* 🚨 RGB অ্যানিমেটেড সিকিউরিটি ওয়ার্নিং পপআপ */
+.cyber-security-modal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    width: 380px;
+    background: rgba(5, 5, 10, 0.95);
+    border: 2px solid #ff0055;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    z-index: 10000000;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* 🌈 নিওন RGB গ্লো অ্যানিমেশন */
+    box-shadow: 0 0 20px #ff0055, inset 0 0 15px rgba(255, 0, 85, 0.3);
+    animation: rgbBlink 3s infinite linear;
+}
+
+.cyber-security-modal.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* RGB বর্ডার এবং গ্লো চেঞ্জিং অ্যানিমেশন */
+@keyframes rgbBlink {
+    0% { border-color: #ff0055; box-shadow: 0 0 25px #ff0055, inset 0 0 15px rgba(255, 0, 85, 0.2); }
+    33% { border-color: #00f0ff; box-shadow: 0 0 25px #00f0ff, inset 0 0 15px rgba(0, 240, 255, 0.2); }
+    66% { border-color: #00ffcc; box-shadow: 0 0 25px #00ffcc, inset 0 0 15px rgba(0, 255, 204, 0.2); }
+    100% { border-color: #ff0055; box-shadow: 0 0 25px #ff0055, inset 0 0 15px rgba(255, 0, 85, 0.2); }
+}
+
+.sec-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+    animation: pulseGlow 1s infinite alternate;
+}
+
+.sec-title {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.sec-desc {
+    color: #cbd5e1;
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* ওয়ার্নিং বক্সের ক্লোজ বাটন */
+.sec-ok-btn {
+    background: transparent;
+    border: 1px solid #ff0055;
+    color: #ff0055;
+    padding: 10px 30px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.sec-ok-btn:hover {
+    background: #ff0055;
+    color: #fff;
+    box-shadow: 0 0 15px #ff0055;
+}
+
+/* 🎛️ সাইবারপঙ্ক অ্যাডমিন সুইচ */
+.admin-sec-card {
+    background: #0f172a;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 400px;
+    margin: 20px auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.switch-label {
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+.cyber-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+.cyber-switch input { opacity: 0; width: 0; height: 0; }
+.cyber-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #334155;
+    transition: .4s;
+    border-radius: 34px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.cyber-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px; width: 22px;
+    left: 4px; bottom: 3px;
+    background-color: #fff;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+input:checked + .cyber-slider {
+    background-color: rgba(0, 255, 204, 0.2);
+    border-color: #00ffcc;
+}
+input:checked + .cyber-slider:before {
+    transform: translateX(28px);
+    background-color: #00ffcc;
+    box-shadow: 0 0 15px #00ffcc;
+}
+
+    </style>
+
+    <style>
+    .bonus-btn { display:block; margin:14px auto 6px; padding:12px 18px; border:none; border-radius:30px; font-weight:700; font-size:14px; cursor:pointer; color:#04141a; background:linear-gradient(45deg,#ffd166,#ff9f1c); box-shadow:0 6px 18px rgba(255,159,28,.28); max-width:92%; }
+    .bonus-btn:disabled { opacity:.6; cursor:not-allowed; }
+    .bonus-btn small { font-weight:600; opacity:.8; }
+    body { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+<body>
+<div id="cyberToast">⚡ Notification Loaded</div>
+
+<div id="particles-js"></div>
+
+<div id="startPopup">
+    <div class="modal-box">
+        <h2 style="color: #00ffcc;">🔒 Premium Access</h2>
+        <p>USA & UK Verified Gallery</p>
+		<p>Unlock the gallery by watching short ads</p>
+        <div style="margin: 15px 0; font-size: 13px;">
+            🔥 New Photos Added Today <br>
+            👁 <span id="viewers">124</span> people viewing now
+        </div>
+        <button class="btn" onclick="unlockSite()" style="border:none; cursor:pointer;">Unlock Now 🚀</button>
+        <div id="gateMsg" style="font-size:12px; margin-top:12px; min-height:16px; color:#9fb0d0;"></div>
+    </div>
+</div>
+
+<div id="topUI">
+    <div class="birds-container">
+        <div class="magic-bird" id="bird1">
+            <div class="vector-bird">
+                <div class="bird-wing wing-left"></div>
+                <div class="bird-body">
+                    <div class="bird-eye"></div>
+                </div>
+                <div class="bird-wing wing-right"></div>
+                <div class="bird-tail"></div>
+            </div>
+        </div>
+        <div class="magic-bird" id="bird2">
+            <div class="vector-bird">
+                <div class="bird-wing wing-left"></div>
+                <div class="bird-body">
+                    <div class="bird-eye"></div>
+                </div>
+                <div class="bird-wing wing-right"></div>
+                <div class="bird-tail"></div>
+            </div>
+        </div>
+    </div>
+
+    <header class="header">
+        <button class="icon-btn" onclick="toggleSidebar()"><i class="fa fa-bars"></i></button>
+
+        <div class="cyber-drone drone-left">
+            <div class="drone-wings"></div>
+            <div class="drone-body"></div>
+            <div class="torch-light"></div>
+        </div>
+        
+        <h1 class="title" id="logo-text">My Gallery</h1>     
+        
+        <div class="cyber-drone drone-right">
+            <div class="drone-wings"></div>
+            <div class="drone-body"></div>
+            <div class="torch-light"></div>
+        </div>
+
+        <button class="icon-btn" onclick="toggleNotif()"><i class="fa fa-bell"></i></button>
+    </header>
+</div>
+
+<div id="sidebar">
+    <h3 style="color:#00ffcc; margin-bottom:20px;">Menu</h3>
+    <button onclick="toggleTheme()" class="side-btn">🌙 Dark / Light Mode</button>
+    <button onclick="openPromoModal()" class="side-btn">🎟 Premium Code</button>
+    <a href="https://www.facebook.com/Sabbir7xa" target="_blank" class="side-btn" style="display:block; text-align:center; text-decoration:none;" id="devPortfolioBtn">🌐 Developer Website</a>
+    <button onclick="toggleSidebar()" class="side-btn" style="background:#ff4444; color:#fff; margin-top:20px; text-align:center;">❌ Close</button>
+</div>
+
+<div id="notifPanel" class="notif-panel">
+    <div class="notif-header">
+        <h3>📢 Notifications</h3>
+    </div>
+
+    <div id="notifList" class="notif-list">
+        Loading...
+    </div>
+
+    <button onclick="toggleNotif()" class="notif-close-btn">❌ Close</button>
+</div>   
+</div>
+
+<!-- 📢 AD SLOT 1 — TOP BANNER -->
+<div id="adSlot1Container" style="width:100%; text-align:center; margin-top:54px; min-height:0;"></div>
+
+<br>
+<div class="container">
+    <p>Handpicked Aesthetics for You 💖</p>
+
+    <div class="filter-buttons">
+        <button class="filter-btn active" onclick="filterGallery('all')">All</button>
+        <button class="filter-btn" onclick="filterGallery('nature')">Nature</button>
+        <button class="filter-btn" onclick="filterGallery('fashion')">Fashion</button>
+        <button class="filter-btn" onclick="filterGallery('urban')">Urban</button>
+        <button class="filter-btn" onclick="filterGallery('travel')">Travel</button>
+    </div>
+
+    <div class="gallery" id="galleryGrid">
+        <div class="card item nature" data-id="img_its_me_001">
+            <img src="https://res.cloudinary.com/sabbir-img-upload/image/upload/v1781843393/dkrkwkjewktzpntnqsxb.png" alt="Cute Aesthetic Nature Wallpaper USA" onclick="window.openContent('img_its_me_001')">
+            <div class="caption-bar card-info">
+                <div class="card-meta" style="width:100%;">
+                    <span class="cat-chip">nature</span>
+                    <div class="like-btn-container" onclick="toggleLike('img_its_me_001', this)">
+                        <i class="fa-regular fa-heart"></i> <span class="like-text">loading...</span>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="unlock-btn" onclick="window.openContent('img_its_me_001')" title="Unlock">
+                        <i class="fa-solid fa-lock"></i><span class="unlock-label">Unlock</span>
+                    </button>
+                    <button class="card-icon-btn share-btn" onclick="window.shareContent('img_its_me_001')" title="Share">
+                        <i class="fa-solid fa-share-nodes"></i>
+                    </button>
+                    <button class="card-icon-btn dl-btn" onclick="openDownloadModal(event)" title="Download">
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="timer" style="margin-top:20px; color:#ff4444; font-weight:bold;">⏳ Offer expires in: --:--</div>
+    <button id="bonusBtn" class="bonus-btn" onclick="window.claimBonus()" style="display:none;">🎁 Watch an ad for a free unlock step</button>
+    
+    <!-- 📢 AD SLOT 2 — MID GALLERY -->
+    <div id="adSlot2Container" style="width:100%; text-align:center; margin:20px auto; min-height:0;"></div>
+</div>
+
+<div id="contentViewer" aria-hidden="true">
+    <div class="cv-box" role="dialog" aria-modal="true">
+        <div class="cv-head">
+            <div class="cv-title" id="cvTitle">Loading…</div>
+            <button class="cv-close" onclick="window.closeContentViewer()" title="Close">✕</button>
+        </div>
+        <div class="cv-stage" id="cvStage"></div>
+        <div class="cv-panel">
+            <div class="cv-step" id="cvStep"></div>
+            <div class="cv-bar"><span id="cvBar"></span></div>
+            <div class="cv-msg" id="cvMsg"></div>
+            <div class="cv-actions">
+                <button class="cv-btn" id="cvMainBtn" onclick="window.viewerMainAction()">Start unlocking</button>
+                <button class="cv-btn sec" id="cvShareBtn" onclick="window.viewerShare()"><i class="fa-solid fa-share-nodes"></i> Share</button>
+                <button class="cv-btn sec" id="cvCopyBtn" onclick="window.viewerCopy()"><i class="fa-regular fa-copy"></i> Copy Link</button>
+                <button class="cv-btn sec" id="cvDlBtn" onclick="window.openDownloadModal(event)"><i class="fa-solid fa-download"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="shareSheet" onclick="if(event.target===this) window.closeShareSheet()">
+    <div class="share-box">
+        <div class="share-title"><span>Share</span><button onclick="window.closeShareSheet()">✕</button></div>
+        <input type="text" id="shareLinkInput" readonly onclick="this.select()">
+        <button class="copy-big" onclick="window.copyShareLink()"><i class="fa-regular fa-copy"></i> Copy Link</button>
+        <div class="share-apps">
+            <a id="shareWa" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+            <a id="shareTg" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-telegram"></i> Telegram</a>
+            <a id="shareFb" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-facebook"></i> Facebook</a>
+            <button id="shareNativeBtn" onclick="window.shareNative()"><i class="fa-solid fa-ellipsis"></i> More</button>
+        </div>
+    </div>
+</div>
+
+<div id="downloadModal">
+    <div class="modal-box">
+        <h3>Verify You're Human 🤖</h3>
+        <p>To support us, please join our Community or complete a quick action.</p>
+        <a href="https://sabbir-premium-store.vercel.app/" class="btn">Join Community to Download 🚀</a>
+        <br><br>
+        <button onclick="closeDownload()" style="background:none; border:none; color:#777; cursor:pointer;">Close</button>
+    </div>
+</div>
+
+<div class="popup" id="popup">
+    <button class="close-popup-btn" onclick="closeImg()">✕</button>
+    <img id="popupImg" style="max-width:90%; border-radius:15px;" alt="popup">
+</div>
+
+<div id="promoModal">
+    <div class="admin-box">
+        <h2 style="color:#00ffcc;">🎟 Promo Code</h2>
+        <input type="text" id="promoInput" placeholder="Enter Your Promo Code">
+        <button onclick="checkPromoCode()">Unlock / Proceed</button>
+        <button onclick="closePromoModal()" style="background:#ff4444;color:#fff; margin-top:10px;">Close</button>
+    </div>
+</div>
+
+<div id="luxuryLoginModal" class="luxury-modal" style="display: none;">
+    <div class="luxury-card">
+        <h2>Admin Authentication</h2>
+        
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="adminEmailInput" placeholder="Enter Admin Email" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-key"></i>
+            <input type="text" id="adminUidInput" placeholder="Enter Admin Security Key (UID)" required>
+        </div>
+
+        <button class="luxury-btn" onclick="submitAdminLogin()">Verify & Login</button>
+    </div>
+</div>
+
+<div id="topNotice" style="display:none;">
+    <marquee id="topNoticeText">
+        Welcome...
+    </marquee>
+</div>
+
+<div id="adminPanel" class="vip-dashboard" style="display: none;">
+    <div class="dash-sidebar">
+        <div class="admin-profile">
+            <div class="avatar-glow"></div>
+            <h3>Hamim Admin</h3>
+            <span>VIP Control Mode</span><br>
+			<a href="https://www.facebook.com/Sabbir7xa" target="_blank" class="dev-watermark" title="Visit Developer Profile">Dev X Sabbir</a>
+        </div>
+        <nav class="sidebar-menu">
+            <button class="menu-btn active" onclick="switchTab('upload-tab', this)"><i class="fa-solid fa-cloud-arrow-up"></i> Image Upload</button>
+            <button class="menu-btn" onclick="switchTab('files-tab', this); window.loadAdminFiles();"><i class="fa-solid fa-folder-open"></i> File Management</button>
+            <button class="menu-btn" onclick="switchTab('security-tab', this); window.loadPrivacyFiles();"><i class="fa-solid fa-shield-halved"></i> Access & Privacy</button>
+            <button class="menu-btn" onclick="switchTab('private-tab', this); window.loadPrivateFiles();"><i class="fa-solid fa-user-lock"></i> Private</button>
+            <button class="menu-btn" onclick="switchTab('unlock-tab', this); window.loadUnlockSettings();"><i class="fa-solid fa-unlock-keyhole"></i> Unlock Settings</button>
+            <button class="menu-btn" onclick="switchTab('notif-tab', this)"><i class="fa-solid fa-bell"></i> Live Notice</button>
+            <button class="menu-btn" onclick="switchTab('ads-tab', this); window.loadAdsSettings();"><i class="fa-solid fa-rectangle-ad"></i> Ads Manager</button>
+            <button class="menu-btn font-neon" onclick="switchTab('update-tab', this)"><i class="fa-solid fa-hourglass-half"></i> Future Update</button>
+			
+        </nav>
+        <button class="dash-logout" onclick="location.reload()"><i class="fa-solid fa-right-from-bracket"></i> Self Destruct</button>
+    </div>
+
+    <div class="dash-main">
+        <div id="upload-tab" class="tab-content active">
+            <h2><i class="fa-solid fa-cloud-arrow-up"></i> Core Image Uploader</h2>
+            <p>Direct premium hosting injection to Cloudinary storage with Category Targeting.</p>
+            <div class="vip-zone">
+                <div class="input-group-dash" style="margin-bottom: 20px;">
+                    <label><i class="fa-solid fa-layer-group"></i> Target Category</label>
+                    <select id="adminCategorySelect" style="width: 100%; padding: 15px; background: #070911; border: 1px solid #1a2035; border-radius: 10px; color: #fff; outline: none;">
+                        <option value="Nature">🌲 Nature</option>
+                        <option value="Fashion">👠 Fashion</option>
+                        <option value="Urban">🏙️ Urban</option>
+                        <option value="Travel">✈️ Travel</option>
+                    </select>
+                </div>
+                
+                <div class="input-group-dash" style="margin-bottom: 20px;">
+                    <label><i class="fa-solid fa-eye"></i> Visibility</label>
+                    <select id="adminVisibilitySelect" style="width: 100%; padding: 15px; background: #070911; border: 1px solid #1a2035; border-radius: 10px; color: #fff; outline: none;">
+                        <option value="public">🌍 Public (shows in gallery, needs ads to unlock)</option>
+                        <option value="private">🔒 Private (hidden, share by secret link only)</option>
+                    </select>
+                    <div id="adminDetectedType" style="font-size:12px; color:#8fa0dd; margin-top:6px;">Content type: select a file (Photo / Video is detected automatically)</div>
+                </div>
+                <input type="file" id="adminFileInput" accept="image/*,video/*" hidden onchange="window.adminFileChosen(this)">
+                <label for="adminFileInput" class="upload-dropzone">
+                    <i class="fa-solid fa-images" style="font-size: 50px; color: #00f0ff;"></i>
+                    <p id="adminFileLabel">Click to Select Admin Files (Image/Video)</p>
+                </label>
+                <input type="file" id="adminThumbInput" accept="image/*" hidden onchange="window.adminThumbChosen(this)">
+                <label for="adminThumbInput" style="display:block; margin-top:12px; padding:12px; border:1px dashed #1a2035; border-radius:10px; color:#8fa0dd; font-size:13px; cursor:pointer;"><i class="fa-regular fa-image"></i> <span id="adminThumbLabel">Thumbnail (optional) — tap to choose</span></label>
+                <div class="input-group-dash" style="margin-top:14px;">
+                    <label><i class="fa-solid fa-align-left"></i> Short text under the card (optional, 1-2 lines)</label>
+                    <input type="text" id="adminTextInput" maxlength="140" placeholder="e.g. New trending video 🔥" style="width:100%; padding:14px; background:#070911; border:1px solid #1a2035; border-radius:10px; color:#fff; outline:none; margin-top:5px;">
+                </div>
+                <div class="input-group-dash" style="margin-top:14px;">
+                    <label><i class="fa-solid fa-link"></i> OR add by video link (no file upload)</label>
+                    <input type="url" id="adminLinkInput" placeholder="https://... (after unlocking, the visitor is sent to this link)" style="width:100%; padding:14px; background:#070911; border:1px solid #1a2035; border-radius:10px; color:#fff; outline:none; margin-top:5px;">
+                    <select id="adminLinkType" style="width:100%; padding:12px; background:#070911; border:1px solid #1a2035; border-radius:10px; color:#fff; outline:none; margin-top:8px;">
+                        <option value="video">Link type: Video</option>
+                        <option value="image">Link type: Photo</option>
+                    </select>
+                    <div style="font-size:12px; color:#8fa0dd; margin-top:6px;">Link mode: leave the file empty, add a thumbnail (above) + text, then press the upload button.</div>
+                </div>
+                <div id="adminUploadProgress" style="width: 0%; height: 4px; background: #00f0ff; margin-top: 10px; transition: width 0.2s; border-radius: 10px;"></div>
+                <button class="cyber-btn" onclick="window.handleAdminUpload()">Inject to Server</button>
+            </div>
+        </div>
+
+        <div id="files-tab" class="tab-content">
+            <h2><i class="fa-solid fa-folder-open"></i> Central File Core</h2>
+            <p>Monitor, intercept and wipe uploaded database files instantly.</p>
+            <div class="vip-zone">
+                <div style="overflow-x: auto;">
+                    <table class="cyber-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #00f0ff; color: #00f0ff;">
+                                <th style="padding: 12px;">File</th>
+                                <th style="padding: 12px;">Category</th>
+                                <th style="padding: 12px;">Type</th>
+                                <th style="padding: 12px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminFileList">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="security-tab" class="tab-content">
+            <h2><i class="fa-solid fa-shield-halved"></i> Privacy & Access Protocols</h2>
+            <p>Toggle website operational state, visibility, and privacy status.</p>
+            <div class="vip-zone">
+                <div style="overflow-x: auto;">
+                    <table class="cyber-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #ff0055; color: #ff0055;">
+                                <th style="padding: 12px;">File Name</th>
+                                <th style="padding: 12px;">Category</th>
+                                <th style="padding: 12px;">Status</th>
+                                <th style="padding: 12px;">Toggle Visibility</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminPrivacyList">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="private-tab" class="tab-content">
+            <h2><i class="fa-solid fa-user-lock"></i> Private Vault</h2>
+            <p>Only you (logged-in admin) can see this list. Private items are not in the public gallery, search or filters.</p>
+            <div class="vip-zone">
+                <div id="privBackendNote" style="font-size:12px; color:#ff9800; margin-bottom:10px;"></div>
+                <div style="overflow-x: auto;">
+                    <table class="cyber-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead><tr style="border-bottom: 2px solid #ff0055; color: #ff0055;">
+                            <th style="padding: 12px;">File</th><th style="padding: 12px;">Category</th><th style="padding: 12px;">Type</th><th style="padding: 12px;">Actions</th>
+                        </tr></thead>
+                        <tbody id="adminPrivateList"></tbody>
+                    </table>
+                </div>
+                <div id="privSharePanel" class="cyber-card-inner" style="display:none; margin-top:20px;">
+                    <h4>🔗 Share links — <span id="privShareName"></span></h4>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                        <div><label style="font-size:12px; color:#8fa0dd;">Expires after (hours, 0 = never)</label><input type="number" min="0" id="shareExpiryInput" class="adm-field" value="24"></div>
+                        <div><label style="font-size:12px; color:#8fa0dd;">Max uses (0 = unlimited)</label><input type="number" min="0" id="shareMaxInput" class="adm-field" value="1"></div>
+                    </div>
+                    <button class="cyber-btn" style="margin-top:12px;" onclick="window.createShareLink()">Generate &amp; Copy Private Link</button>
+                    <div id="shareListBox" style="margin-top:14px; font-size:13px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="unlock-tab" class="tab-content">
+            <h2><i class="fa-solid fa-unlock-keyhole"></i> Unlock Settings</h2>
+            <p>How many advertisement steps are required before a photo or video opens.</p>
+            <div class="vip-zone">
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div><label style="font-size:12px; color:#8fa0dd;">Photo steps</label><input type="number" min="1" max="20" id="cfgPhotoSteps" class="adm-field" value="3"></div>
+                    <div><label style="font-size:12px; color:#8fa0dd;">Video steps</label><input type="number" min="1" max="30" id="cfgVideoSteps" class="adm-field" value="6"></div>
+                    <div><label style="font-size:12px; color:#8fa0dd;">Access window after unlock (hours)</label><input type="number" min="1" max="720" id="cfgAccessHours" class="adm-field" value="24"></div>
+                    <div><label style="font-size:12px; color:#8fa0dd;">Minimum seconds per step</label><input type="number" min="1" max="120" id="cfgMinStep" class="adm-field" value="5"></div>
+                </div>
+                <p style="font-size:12px; color:#8fa0dd; margin-top:14px;">The ad network for each step (Adsgram / Monetag / Adsterra) is chosen in <b>Ads Manager</b>. "Minimum seconds" is used for the Adsterra direct link: the visitor must stay on the ad page at least that long.</p>
+                <button class="cyber-btn" style="margin-top:14px;" onclick="window.saveUnlockSettings()">💾 Save Unlock Settings</button>
+            </div>
+        </div>
+
+        <div id="notif-tab" class="tab-content">
+            <h2><i class="fa-solid fa-bell"></i> Realtime Notice & RGB Popup Broadcaster</h2>
+            <p>Forcefully push top bar notifications or active popup modals to all visitors.</p>
+            <div class="vip-zone grid-2">
+                <div class="cyber-card-inner">
+                    <h4>📡 Top Bar Notification</h4>
+                    <div class="input-group-dash" style="margin-top: 15px;">
+                        <input type="text" id="adminNoticeInput" placeholder="Enter Scrolling Notice Text...">
+                    </div>
+                    <button class="cyber-btn" onclick="window.broadcastNotice()">Update Notice Bar</button>
+                </div>
+                
+				<div class="admin-sec-card" style="background:#0f172a; border:1px solid rgba(0,240,255,0.2); padding:20px; border-radius:12px; display:flex; flex-direction:column; gap:18px; font-family:sans-serif;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                        <div>
+                            <div class="switch-label" style="color:#fff; font-weight:bold; font-size:14px; letter-spacing:1px;">🛡️ F12 / DevTools BLOCK</div>
+                            <div id="secF12Text" style="font-size:12px; margin-top:5px; font-weight:bold; letter-spacing:1px; color:#ff0055;">STATUS: LOADING...</div>
+                        </div>
+                        <label class="cyber-switch"><input type="checkbox" id="secF12" onchange="saveSecurity()"><span class="cyber-slider"></span></label>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                        <div>
+                            <div class="switch-label" style="color:#fff; font-weight:bold; font-size:14px; letter-spacing:1px;">🖱️ RIGHT-CLICK BLOCK</div>
+                            <div id="secRCText" style="font-size:12px; margin-top:5px; font-weight:bold; letter-spacing:1px; color:#ff0055;">STATUS: LOADING...</div>
+                        </div>
+                        <label class="cyber-switch"><input type="checkbox" id="secRC" onchange="saveSecurity()"><span class="cyber-slider"></span></label>
+                    </div>
+                </div>
+
+                <div class="cyber-card-inner">
+                    <h4>💥 Active RGB Center Popup</h4>
+                    <div class="input-group-dash" style="margin-top: 15px;">
+                        <textarea id="adminPopupTextInput" rows="2" placeholder="Popup Message Text..."></textarea>
+                    </div>
+                    <div class="input-group-dash" style="margin-top: 10px;">
+                        <input type="text" id="adminPopupLinkInput" placeholder="Optional Action Link (https://...)">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="cyber-btn" onclick="window.broadcastPopup()">Push Popup</button>
+                        <button class="cyber-btn btn-red" onclick="window.deletePopup()">Delete Popup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ads-tab" class="tab-content">
+            <h2><i class="fa-solid fa-rectangle-ad"></i> Ads Manager — Adsgram · Monetag · Adsterra</h2>
+            <p>Pick the network for each ad place. Changes go live on every device instantly. Save, then press ▶ Test inside Telegram.</p>
+
+            <div class="vip-zone" style="display:flex; flex-direction:column; gap:20px;">
+
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:4px;">🔓 Login Unlock Ad</h4>
+                    <p style="font-size:12px; color:#8fa0dd; margin-bottom:12px;">Shown once when a visitor opens the gallery (before anything else).</p>
+                    <label style="font-size:12px; color:#8fa0dd;">Ad Network</label>
+                    <select id="ads_login_provider" class="adm-field" onchange="window.adsProviderChanged('login')">
+                        <option value="adsgram">Adsgram</option>
+                        <option value="monetag">Monetag</option>
+                        <option value="adsterra">Adsterra (Direct Link)</option>
+                        <option value="off">Off (no ad)</option>
+                    </select>
+                    <div id="ads_login_row_adsgram" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsgram Block ID</label>
+                        <input type="text" id="ads_login_adsgram" class="adm-field" placeholder="e.g. 28869">
+                    </div>
+                    <div id="ads_login_row_monetag" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Monetag Zone ID (Block ID)</label>
+                        <input type="text" id="ads_login_monetag" class="adm-field" placeholder="e.g. 1234567">
+                        <select id="ads_login_fmt" class="adm-field">
+                            <option value="int">Format: Rewarded Interstitial</option>
+                            <option value="pop">Format: Rewarded Popup</option>
+                        </select>
+                    </div>
+                    <div id="ads_login_row_adsterra" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsterra Direct Link</label>
+                        <input type="text" id="ads_login_adsterra" class="adm-field" placeholder="https://... (empty = default link)">
+                    </div>
+                    <button id="ads_login_test" class="adm-mini" style="background:#00f0ff; margin:12px 0 0 0; padding:8px 14px;" onclick="window.testAdSlot('login')">▶ Test</button>
+                </div>
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:4px;">🖼️ Content Unlock Ad</h4>
+                    <p style="font-size:12px; color:#8fa0dd; margin-bottom:12px;">Shown for every photo / video unlock step (steps count: Unlock Settings).</p>
+                    <label style="font-size:12px; color:#8fa0dd;">Ad Network</label>
+                    <select id="ads_content_provider" class="adm-field" onchange="window.adsProviderChanged('content')">
+                        <option value="adsgram">Adsgram</option>
+                        <option value="monetag">Monetag</option>
+                        <option value="adsterra">Adsterra (Direct Link)</option>
+                        <option value="off">Off (no ad)</option>
+                    </select>
+                    <div id="ads_content_row_adsgram" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsgram Block ID</label>
+                        <input type="text" id="ads_content_adsgram" class="adm-field" placeholder="e.g. 28869">
+                    </div>
+                    <div id="ads_content_row_monetag" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Monetag Zone ID (Block ID)</label>
+                        <input type="text" id="ads_content_monetag" class="adm-field" placeholder="e.g. 1234567">
+                        <select id="ads_content_fmt" class="adm-field">
+                            <option value="int">Format: Rewarded Interstitial</option>
+                            <option value="pop">Format: Rewarded Popup</option>
+                        </select>
+                    </div>
+                    <div id="ads_content_row_adsterra" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsterra Direct Link</label>
+                        <input type="text" id="ads_content_adsterra" class="adm-field" placeholder="https://... (empty = default link)">
+                    </div>
+                    <button id="ads_content_test" class="adm-mini" style="background:#00f0ff; margin:12px 0 0 0; padding:8px 14px;" onclick="window.testAdSlot('content')">▶ Test</button>
+                </div>
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:4px;">🎁 Optional Bonus Ad</h4>
+                    <p style="font-size:12px; color:#8fa0dd; margin-bottom:12px;">Button under the offer timer. Each watched ad gives the visitor 1 free unlock step (max 3 saved).</p>
+                    <label style="font-size:12px; color:#8fa0dd;">Ad Network</label>
+                    <select id="ads_bonus_provider" class="adm-field" onchange="window.adsProviderChanged('bonus')">
+                        <option value="adsgram">Adsgram</option>
+                        <option value="monetag">Monetag</option>
+                        <option value="adsterra">Adsterra (Direct Link)</option>
+                        <option value="off">Off (no ad)</option>
+                    </select>
+                    <div id="ads_bonus_row_adsgram" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsgram Block ID</label>
+                        <input type="text" id="ads_bonus_adsgram" class="adm-field" placeholder="e.g. 28869">
+                    </div>
+                    <div id="ads_bonus_row_monetag" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Monetag Zone ID (Block ID)</label>
+                        <input type="text" id="ads_bonus_monetag" class="adm-field" placeholder="e.g. 1234567">
+                        <select id="ads_bonus_fmt" class="adm-field">
+                            <option value="int">Format: Rewarded Interstitial</option>
+                            <option value="pop">Format: Rewarded Popup</option>
+                        </select>
+                    </div>
+                    <div id="ads_bonus_row_adsterra" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsterra Direct Link</label>
+                        <input type="text" id="ads_bonus_adsterra" class="adm-field" placeholder="https://... (empty = default link)">
+                    </div>
+                    <button id="ads_bonus_test" class="adm-mini" style="background:#00f0ff; margin:12px 0 0 0; padding:8px 14px;" onclick="window.testAdSlot('bonus')">▶ Test</button>
+                </div>
+
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:8px;">⚙️ Monetag SDK</h4>
+                    <label style="font-size:12px; color:#8fa0dd;">SDK script URL (the src of the tag from your Monetag dashboard)</label>
+                    <input type="text" id="ads_monetag_sdk" class="adm-field" placeholder="https://libtl.com/sdk.js">
+                </div>
+
+                <button class="cyber-btn" onclick="window.saveAdsSettings()">💾 Save All Ad Settings</button>
+
+                <div class="cyber-card-inner" style="border:1px solid rgba(80,170,255,0.35); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:12px; color:#58b6ff;">✈️ Telegram Bot / Mini App</h4>
+                    <label style="font-size:12px; color:#8fa0dd;">Telegram Bot Token</label>
+                    <input type="password" id="tgBotToken" class="adm-field" autocomplete="off" placeholder="123456789:AA...">
+                    <label style="font-size:12px; color:#8fa0dd; display:block; margin-top:10px;">Bot Username (auto-filled from token)</label>
+                    <input type="text" id="tgBotUser" class="adm-field" placeholder="my_gallery_bot" oninput="window.refreshTgPreview()">
+                    <label style="font-size:12px; color:#8fa0dd; display:block; margin-top:10px;">Mini App short name (optional — from BotFather /newapp; empty = main Mini App)</label>
+                    <input type="text" id="tgAppName" class="adm-field" placeholder="gallery" oninput="window.refreshTgPreview()">
+                    <div id="tgLinkPreview" style="font-size:12px; color:#8fa0dd; margin-top:8px; word-break:break-all;"></div>
+                    <button class="cyber-btn" style="margin-top:14px;" onclick="window.saveTelegramSettings()">💾 Save Telegram Settings</button>
+                </div>
+
+                <!-- Developer Website Link -->
+                <div class="cyber-card-inner" style="border:1px solid rgba(255,204,0,0.3); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:12px; color:#ffcc00;">🌐 Developer Button Link (Sidebar)</h4>
+                    <div class="input-group-dash">
+                        <label style="font-size:12px; color:#8fa0dd;">Your Website URL</label>
+                        <input type="text" id="devWebsiteInput" placeholder="https://yourwebsite.com" style="width:100%;padding:10px;background:#070911;border:1px solid #1a2035;border-radius:8px;color:#fff;outline:none;margin-top:5px;">
+                    </div>
+                    <div class="input-group-dash" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Button Label</label>
+                        <input type="text" id="devBtnLabelInput" placeholder="e.g. My Portfolio 🌟" style="width:100%;padding:10px;background:#070911;border:1px solid #1a2035;border-radius:8px;color:#fff;outline:none;margin-top:5px;">
+                    </div>
+                    <button class="cyber-btn" style="margin-top:14px; background:linear-gradient(45deg,#ffcc00,#ff8c00); color:#000;" onclick="window.saveDevWebsite()">💾 Save Developer Link</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="update-tab" class="tab-content">
+            <div class="coming-soon-box">
+                <div class="glitch-text" data-text="VERSION 2.0">VERSION 2.0</div>
+                <h2>SYSTEM UPDATE COMING SOON</h2>
+                <!-- Animated Developer Profile Picture -->
+                <div style="margin:18px auto; position:relative; width:90px; height:90px;">
+                    <div style="position:absolute; inset:-4px; border-radius:50%; background:conic-gradient(#00ffcc, #7c3aed, #ff0080, #00ccff, #00ffcc); animation:rotateRGB 3s linear infinite; z-index:0;"></div>
+                    <div style="position:absolute; inset:2px; border-radius:50%; background:#0b0b1a; z-index:1;"></div>
+                    <img src="https://res.cloudinary.com/sabbir-img-upload/image/upload/v1781843393/dkrkwkjewktzpntnqsxb.png"
+                        alt="Developer"
+                        style="position:absolute; inset:4px; width:calc(100% - 8px); height:calc(100% - 8px); border-radius:50%; object-fit:cover; z-index:2; animation:devImgFloat 3s ease-in-out infinite;">
+                </div>
+                <style>
+                @keyframes devImgFloat {
+                    0%,100% { transform:translateY(0) scale(1); box-shadow:0 0 0 0 rgba(0,255,204,0.4); }
+                    50% { transform:translateY(-5px) scale(1.04); box-shadow:0 8px 20px rgba(0,255,204,0.3); }
+                }
+                </style>
+				<a href="https://www.facebook.com/Sabbir7xa" target="_blank" class="dev-watermark" title="Visit Developer Profile">Dev X Sabbir</a>
+                <div class="loader-bar"><div></div></div>
+                <p>AI Automated Threat Detection, Bypass Firewalls, and Multi-Cloud Mirroring features are currently compiling in the shadows...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="liveCyberPopup" class="luxury-modal" style="display: none; background: rgba(0,0,0,0.9); z-index: 100000;">
+    <div class="luxury-card" style="border-image: linear-gradient(45deg, #00f0ff, #ff0055, #00ffcc) 1; box-shadow: 0 0 40px rgba(0, 240, 255, 0.5);">
+        <h2 id="livePopupTitle"><i class="fa-solid fa-triangle-exclamation"></i> SYSTEM BROADCAST</h2>
+        <p id="livePopupMessage" style="color: #fff; font-size: 16px; margin: 20px 0; font-weight: 500;"></p>
+        <a id="livePopupLink" href="#" target="_blank" class="cyber-btn" style="display: none; margin-bottom: 15px; text-decoration: none; text-align: center;">Action Link</a>
+        <button class="cyber-btn btn-red" onclick="document.getElementById('liveCyberPopup').style.display='none'">Close Terminal</button>
+    </div>
+</div>
+
+<div id="copyToast" class="copy-toast">Link Copied ✅</div>
+
+<div class="social">
+    <a href="https://www.facebook.com/Sabbir7xa"><i class="fab fa-facebook"></i></a>
+    <a href="https://sabbir-duo-jannat-25.blogspot.com/"><i class="fab fa-instagram"></i></a>
+    <a href="https://www.effectivecpmnetwork.com/ik9vkq6he4?key=b77675332b05984222206472447a446c"><i class="fab fa-twitter"></i></a>
+    <a href="https://t.me/Sabbir7xs"><i class="fab fa-telegram"></i></a>
+    <a href="https://www.effectivecpmnetwork.com/ik9vkq6he4?key=b77675332b05984222206472447a446c"><i class="fab fa-youtube"></i></a>
+</div>
+
+<div class="cyber-security-modal" id="securityModal">
+    <div class="sec-icon">⚠️</div>
+    <div class="sec-title">Security Alert</div>
+    <div class="sec-desc">
+        SYSTEM BACKEND IS LOCKED!<br>
+        Developer tools and data extraction are strictly prohibited on this node.
+    </div>
+    <button class="sec-ok-btn" onclick="closeSecModal()">Acknowledge</button>
+</div>
+
+<footer>
+    <p>&copy; 2026 MyGallery - Premium Content for USA/UK users.</p><br>
+    <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">DMCA</a></p>
+</footer>
+
+<script type="module" src="index.js"></script>
+
+</body>
+</html>
