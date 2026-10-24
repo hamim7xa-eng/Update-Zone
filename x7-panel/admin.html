@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+html {
+    background: #0f2027;
+    overscroll-behavior: none;
+    height: 100%;
+}
+body {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+    -webkit-touch-callout: default;
+    -webkit-tap-highlight-color: transparent;
+    /* ✅ FIX: মোবাইল স্ক্রোল ও কীবোর্ড ওঠার সময় সাদা দেখানো বন্ধ */
+    overscroll-behavior: none;
+    overscroll-behavior-y: none;
+    min-height: 100%;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+body {
+    background: linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#000);
+    background-size: 400% 400%; color: #fff; text-align: center; overflow-x: hidden;
+}
+.card {
+    /* fadeUp এবং floatCard একসাথে দিলে transform ক্র্যাশ করে, তাই floatCard-এ সামান্য ডিলে দেওয়া ভালো */
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    position: relative; 
+    border-radius: 15px; 
+    overflow: hidden; 
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px); 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); 
+    transition: 0.4s;
+}
+.card img, .card video { 
+    width: 100%; 
+    height: 160px; 
+    object-fit: cover; 
+    cursor: pointer; 
+    transition: .4s; 
+    display: block;
+    background: #000; 
+}
+.card:hover img, .card:hover video { 
+    transform: scale(1.08); 
+}
+.card:hover { box-shadow: 0 0 25px #00ffcc; }
+.close-popup-btn {
+    position: absolute; top: 20px; right: 20px; width: 45px; height: 45px;
+    border-radius: 50%; border: none; background: #ff4444; color: #fff;
+    font-size: 22px; cursor: pointer; z-index: 99999;
+}
+#adminPanel, #luxuryLoginModal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,.92); display: none; justify-content: center;
+    align-items: center; z-index: 999999; backdrop-filter: blur(10px);
+}
+.copy-toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: #111; color: #00ffcc; border: 1px solid #00ffcc;
+    padding: 10px 20px; border-radius: 10px; display: none; z-index: 999999;
+}
+.title {
+    font-size: 22px; font-weight: 800;
+    background: linear-gradient(90deg, #00ffe7, #7c3aed, #ff0080);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 15px rgba(124, 58, 237, 0.5);
+}
+.gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.card { border-radius: 16px; }
+.card { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; transition: none !important; }
+.card:hover { box-shadow: 0 8px 32px 0 rgba(0,0,0,0.37) !important; }
+.card img, .card video { transition: none !important; }
+.priv-badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; background:rgba(255,0,85,.15); color:#ff5c8a; border:1px solid rgba(255,0,85,.4); }
+.adm-mini { padding:5px 10px; margin:2px; font-size:12px; border:none; border-radius:8px; cursor:pointer; font-weight:700; }
+.adm-field { width:100%; padding:10px; background:#070911; border:1px solid #1a2035; border-radius:8px; color:#fff; outline:none; margin-top:5px; }
+.popup {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);
+    display: none; justify-content: center; align-items: center; z-index: 10000; backdrop-filter: blur(8px);
+}
+.btn { display: inline-block; margin-top: 20px; padding: 12px 25px; border-radius: 30px; background: linear-gradient(45deg,#00ffcc,#00ccff); color: #000; text-decoration: none; font-weight: bold; }
+.luxury-modal {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(4, 5, 10, 0.9); backdrop-filter: blur(15px);
+    display: flex; justify-content: center; align-items: center; z-index: 999999; /* 👈 অ্যাডমিন প্যানেল যেন সবার উপরে থাকে */
+    opacity: 0; pointer-events: none; transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.luxury-modal[style*="display: flex"], .luxury-modal.active { opacity: 1 !important; pointer-events: auto !important; }
+.luxury-card {
+    background: #06070d; padding: 35px; border-radius: 24px; width: 92%; max-width: 420px; text-align: center; position: relative; border: 2px solid #00f0ff;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.1); transform: scale(0.7) translateY(-50px); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden;
+}
+.luxury-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, #ff0055, #00ffcc, #9900ff, #ff0055); animation: rotateRGB 4s linear infinite; z-index: -2; }
+.luxury-card::after { content: ''; position: absolute; inset: 3px; background: #06070d; border-radius: 21px; z-index: -1; }
+.luxury-modal[style*="display: flex"] .luxury-card { transform: scale(1) translateY(0); }
+.luxury-card.exit-success { transform: scale(0.3) rotate(10deg) translateY(500px) !important; opacity: 0; transition: all 0.5s cubic-bezier(0.6, -0.28, 0.735, 0.045); }
+.luxury-card.shake-error { animation: neonShake 0.4s ease-in-out !important; border-color: #ff0055 !important; box-shadow: 0 0 40px rgba(255, 0, 85, 0.6) !important; }
+.luxury-card h2 { font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; background: linear-gradient(45deg, #00f0ff, #ff007f, #00ffcc); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: textRGB 3s linear infinite; margin-bottom: 30px; }
+.input-group { position: relative; margin-bottom: 22px; }
+.input-group i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: #00f0ff; font-size: 18px; transition: color 0.3s; }
+.input-group input { width: 100%; padding: 15px 15px 15px 50px; background: rgba(22, 25, 34, 0.7); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 12px; color: #fff; font-size: 15px; outline: none; letter-spacing: 0.5px; transition: all 0.3s ease; }
+.input-group input:focus { border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 0, 127, 0.4); background: #11141d; }
+.input-group input:focus ~ i { color: #ff007f; }
+.luxury-btn { width: 100%; padding: 16px; background: linear-gradient(45deg, #00f0ff, #ff007f); background-size: 200% auto; border: none; border-radius: 12px; color: #fff; font-size: 16px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3); }
+.luxury-btn:hover { background-position: right center; box-shadow: 0 0 25px rgba(255, 0, 127, 0.6); transform: translateY(-2px); }
+.luxury-btn:active { transform: translateY(1px); }
+.vip-dashboard {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #040509; display: flex; z-index: 999999; font-family: 'Segoe UI', Roboto, sans-serif; color: #fff; animation: bootSystem 0.6s cubic-bezier(0.1, 1, 0.1, 1);
+}
+.dash-sidebar { width: 320px; background: #070911; border-right: 2px solid #00f0ff; box-shadow: 5px 0 25px rgba(0, 240, 255, 0.15); display: flex; flex-direction: column; padding: 30px 20px; justify-content: space-between; position: relative; }
+.dash-sidebar::before { content: ''; position: absolute; top: 0; right: 0; width: 2px; height: 100%; background: linear-gradient(to bottom, #00f0ff, #ff0055, #00ffcc); background-size: 100% 200%; animation: moveGlow 4s linear infinite; }
+.admin-profile { text-align: center; margin-bottom: 40px; }
+.avatar-glow { width: 80px; height: 80px; background: radial-gradient(circle, #00f0ff 0%, transparent 70%); border-radius: 50%; border: 2px dashed #ff0055; margin: 0 auto 15px; position: relative; animation: rotateRGB 10s linear infinite; }
+.admin-profile h3 { font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #fff; margin: 0; }
+.admin-profile span { font-size: 11px; color: #ff0055; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+.sidebar-menu { display: flex; flex-direction: column; gap: 12px; flex-grow: 1; }
+.menu-btn { width: 100%; padding: 15px 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(0, 240, 255, 0.1); border-radius: 12px; color: #8fa0dd; font-size: 15px; font-weight: 700; text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 15px; }
+.menu-btn i { font-size: 18px; color: #00f0ff; }
+.menu-btn:hover { background: rgba(0, 240, 255, 0.05); border-color: #ff0055; color: #fff; transform: translateX(5px); box-shadow: -5px 0 10px rgba(255,0,85,0.2); }
+.menu-btn.active { background: linear-gradient(90deg, rgba(0,240,255,0.15) 0%, transparent 100%); border-left: 4px solid #00f0ff; border-color: rgba(0, 240, 255, 0.4); color: #fff; font-weight: 800; }
+.font-neon { animation: pulseGlow 2s infinite; color: #ff0055 !important; }
+.font-neon i { color: #ff0055 !important; }
+.coming-soon-box h2 { display: inline-block; vertical-align: middle; margin-right: 15px; }
+.dev-watermark {
+    font-family: 'Orbitron', 'Poppins', sans-serif; font-weight: 900; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; text-decoration: none !important; display: inline-block; vertical-align: middle; padding: 4px 12px; border-radius: 4px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+    background-image: linear-gradient(90deg, #ff0055, #00ffcc, #0072ff, #ffef00, #ff0055); background-size: 400% 100%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: rgbTextMove 6s linear infinite;
+    transition: all 0.3s ease-in-out; cursor: pointer; position: relative; top: -2px; 
+}
+.dev-watermark:hover { transform: scale(1.08) translateY(-1px); text-shadow: 0 0 10px rgba(0, 255, 204, 0.6), 0 0 20px rgba(255, 0, 85, 0.4); background: rgba(255, 255, 255, 0.08); border-color: rgba(0, 255, 204, 0.4); box-shadow: 0 0 15px rgba(0, 255, 204, 0.1); }
+.dash-main { flex-grow: 1; height: 100%; padding: 40px; overflow-y: auto; background: radial-gradient(circle at top right, #0d111e, #040509); }
+.tab-content { display: none; animation: fadeInTab 0.4s ease; }
+.tab-content.active { display: block; }
+.dash-main h2 { font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: #fff; margin-bottom: 5px; display: flex; align-items: center; gap: 15px; }
+.dash-main p { color: #5c6996; margin-top: 0; font-size: 14px; margin-bottom: 30px; }
+.vip-zone { background: rgba(11, 14, 26, 0.6); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.upload-dropzone { border: 2px dashed rgba(0, 240, 255, 0.3); border-radius: 15px; padding: 50px 20px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.3s; background: rgba(0,0,0,0.2); }
+.upload-dropzone:hover { border-color: #ff0055; background: rgba(255, 0, 85, 0.02); }
+.cyber-btn { padding: 14px 28px; background: linear-gradient(45deg, #00f0ff, #0072ff); border: none; border-radius: 10px; color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; width: 100%; margin-top: 20px; }
+.cyber-btn:hover { box-shadow: 0 0 20px rgba(0,240,255,0.5); transform: translateY(-2px); }
+.btn-red { background: linear-gradient(45deg, #ff0055, #990022) !important; }
+.btn-red:hover { box-shadow: 0 0 20px rgba(255,0,85,0.5) !important; }
+.input-group-dash { display: flex; flex-direction: column; gap: 8px; }
+.input-group-dash label { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #00f0ff; letter-spacing: 1px;}
+.input-group-dash input, .input-group-dash textarea { width: 100%; padding: 15px; background: #070911; border: 1px solid #1a2035; border-radius: 10px; color: #fff; outline: none; transition: 0.3s; }
+.input-group-dash input:focus, .input-group-dash textarea:focus { border-color: #ff0055; box-shadow: 0 0 10px rgba(255,0,85,0.2); }
+.cyber-card-inner { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; }
+.coming-soon-box { text-align: center; padding: 60px 20px; }
+.glitch-text {
+    font-size: 65px; font-weight: 900; letter-spacing: 5px; color: #00f0ff;
+    position: relative; animation: pulseGlow 1.5s infinite;
+}
+.loader-bar {
+    width: 250px; height: 4px; background: rgba(255,255,255,0.05); margin: 25px auto; border-radius: 10px; overflow: hidden;
+}
+.loader-bar div { width: 40%; height: 100%; background: #ff0055; animation: infiniteLoad 2s ease infinite; }
+.dash-logout {
+    padding: 14px; background: rgba(255,0,85,0.1); border: 1px solid rgba(255,0,85,0.3);
+    border-radius: 10px; color: #ff0055; font-weight: 800; cursor: pointer; transition: 0.3s;
+}
+.dash-logout:hover { background: #ff0055; color: #fff; box-shadow: 0 0 15px rgba(255,0,85,0.4); }
+.cyber-table th {
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+.cyber-table td {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+.badge {
+    background: rgba(0, 240, 255, 0.1);
+    color: #00f0ff;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: bold;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+}
+#cyberToast {
+    position: fixed;
+    bottom: -100px; /* ডিফল্টভাবে স্ক্রিনের বাইরে লুকিয়ে থাকবে */
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 15, 30, 0.9);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+    border: 1px solid rgba(0, 240, 255, 0.3);
+    transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* পপআপ এনিমেশন */
+}
+#cyberToast.toast-success {
+    border-color: #00ffcc;
+    box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+}
+#cyberToast.toast-error {
+    border-color: #ff0055;
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.2);
+}
+.admin-sec-card {
+    background: #0f172a;
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    padding: 20px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 400px;
+    margin: 20px auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.switch-label {
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    letter-spacing: 1px;
+}
+.cyber-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+.cyber-switch input { opacity: 0; width: 0; height: 0; }
+.cyber-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #334155;
+    transition: .4s;
+    border-radius: 34px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.cyber-slider:before {
+    position: absolute;
+    content: "";
+    height: 22px; width: 22px;
+    left: 4px; bottom: 3px;
+    background-color: #fff;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
+input:checked + .cyber-slider {
+    background-color: rgba(0, 255, 204, 0.2);
+    border-color: #00ffcc;
+}
+input:checked + .cyber-slider:before {
+    transform: translateX(28px);
+    background-color: #00ffcc;
+    box-shadow: 0 0 15px #00ffcc;
+}
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes floatCard {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+@keyframes rotateRGB { 100% { transform: rotate(360deg); } }
+@keyframes neonShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+@keyframes rgbTextMove { 0% { background-position: 0% 50%; filter: hue-rotate(0deg); } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; filter: hue-rotate(360deg); } }
+@keyframes bootSystem { 0% { opacity: 0; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes fadeInTab { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes moveGlow { 0% { background-position: 0% 0%; } 100% { background-position: 0% 200%; } }
+@keyframes pulseGlow { 0%, 100% { opacity: 0.6; text-shadow: 0 0 5px rgba(255,0,85,0.2); } 50% { opacity: 1; text-shadow: 0 0 15px rgba(255,0,85,0.8); } }
+@keyframes infiniteLoad { 0% { transform: translateX(-150%); } 100% { transform: translateX(250%); } }
+    </style>
+</head>
+<body>
+
+<div id="cyberToast">⚡ Notification Loaded</div>
+<div id="copyToast" class="copy-toast">Link Copied ✅</div>
+
+<div class="popup" id="popup">
+    <button class="close-popup-btn" onclick="closeImg()">✕</button>
+    <img id="popupImg" style="max-width:90%; border-radius:15px;" alt="popup">
+</div>
+
+<!-- 🔐 Admin Login (Email + Password + UID) -->
+<div id="luxuryLoginModal" class="luxury-modal" style="display: flex;">
+    <div class="luxury-card">
+        <h2>Admin Authentication</h2>
+        
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="adminEmailInput" placeholder="Enter Admin Email" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="adminPasswordInput" placeholder="Enter Admin Password" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-key"></i>
+            <input type="text" id="adminUidInput" placeholder="Enter Admin Security Key (UID)" required>
+        </div>
+
+        <button class="luxury-btn" onclick="submitAdminLogin()">Verify & Login</button>
+    </div>
+</div>
+
+<!-- 🛠️ Admin Panel (login shofol hole dekha jabe) -->
+<div id="adminPanel" class="vip-dashboard" style="display: none;">
+    <div class="dash-sidebar">
+        <div class="admin-profile">
+            <div class="avatar-glow"></div>
+            <h3>Hamim Admin</h3>
+            <span>VIP Control Mode</span><br>
+			<a href="https://www.facebook.com/Sabbir7xa" target="_blank" class="dev-watermark" title="Visit Developer Profile">Dev X Sabbir</a>
+        </div>
+        <nav class="sidebar-menu">
+            <button class="menu-btn active" onclick="switchTab('upload-tab', this)"><i class="fa-solid fa-cloud-arrow-up"></i> Image Upload</button>
+            <button class="menu-btn" onclick="switchTab('files-tab', this); window.loadAdminFiles();"><i class="fa-solid fa-folder-open"></i> File Management</button>
+            <button class="menu-btn" onclick="switchTab('security-tab', this); window.loadPrivacyFiles();"><i class="fa-solid fa-shield-halved"></i> Access & Privacy</button>
+            <button class="menu-btn" onclick="switchTab('private-tab', this); window.loadPrivateFiles();"><i class="fa-solid fa-user-lock"></i> Private</button>
+            <button class="menu-btn" onclick="switchTab('unlock-tab', this); window.loadUnlockSettings();"><i class="fa-solid fa-unlock-keyhole"></i> Unlock Settings</button>
+            <button class="menu-btn" onclick="switchTab('notif-tab', this)"><i class="fa-solid fa-bell"></i> Live Notice</button>
+            <button class="menu-btn" onclick="switchTab('ads-tab', this); window.loadAdsSettings();"><i class="fa-solid fa-rectangle-ad"></i> Ads Manager</button>
+            <button class="menu-btn font-neon" onclick="switchTab('update-tab', this)"><i class="fa-solid fa-hourglass-half"></i> Future Update</button>
+			
+        </nav>
+        <button class="dash-logout" onclick="adminLogout()"><i class="fa-solid fa-right-from-bracket"></i> Self Destruct</button>
+    </div>
+
+    <div class="dash-main">
+        <div id="upload-tab" class="tab-content active">
+            <h2><i class="fa-solid fa-cloud-arrow-up"></i> Core Image Uploader</h2>
+            <p>Direct premium hosting injection to Cloudinary storage with Category Targeting.</p>
+            <div class="vip-zone">
+                <div class="input-group-dash" style="margin-bottom: 20px;">
+                    <label><i class="fa-solid fa-layer-group"></i> Target Category</label>
+                    <select id="adminCategorySelect" style="width: 100%; padding: 15px; background: #070911; border: 1px solid #1a2035; border-radius: 10px; color: #fff; outline: none;">
+                        <option value="Nature">🌲 Nature</option>
+                        <option value="Fashion">👠 Fashion</option>
+                        <option value="Urban">🏙️ Urban</option>
+                        <option value="Travel">✈️ Travel</option>
+                    </select>
+                </div>
+                
+                <div class="input-group-dash" style="margin-bottom: 20px;">
+                    <label><i class="fa-solid fa-eye"></i> Visibility</label>
+                    <select id="adminVisibilitySelect" style="width: 100%; padding: 15px; background: #070911; border: 1px solid #1a2035; border-radius: 10px; color: #fff; outline: none;">
+                        <option value="public">🌍 Public (shows in gallery, needs ads to unlock)</option>
+                        <option value="private">🔒 Private (hidden, share by secret link only)</option>
+                    </select>
+                    <div id="adminDetectedType" style="font-size:12px; color:#8fa0dd; margin-top:6px;">Content type: select a file (Photo / Video is detected automatically)</div>
+                </div>
+                <input type="file" id="adminFileInput" accept="image/*,video/*" hidden onchange="window.adminFileChosen(this)">
+                <label for="adminFileInput" class="upload-dropzone">
+                    <i class="fa-solid fa-images" style="font-size: 50px; color: #00f0ff;"></i>
+                    <p id="adminFileLabel">Click to Select Admin Files (Image/Video)</p>
+                </label>
+                <input type="file" id="adminThumbInput" accept="image/*" hidden onchange="window.adminThumbChosen(this)">
+                <label for="adminThumbInput" style="display:block; margin-top:12px; padding:12px; border:1px dashed #1a2035; border-radius:10px; color:#8fa0dd; font-size:13px; cursor:pointer;"><i class="fa-regular fa-image"></i> <span id="adminThumbLabel">Thumbnail (optional) — tap to choose</span></label>
+                <div class="input-group-dash" style="margin-top:14px;">
+                    <label><i class="fa-solid fa-align-left"></i> Short text under the card (optional, 1-2 lines)</label>
+                    <input type="text" id="adminTextInput" maxlength="140" placeholder="e.g. New trending video 🔥" style="width:100%; padding:14px; background:#070911; border:1px solid #1a2035; border-radius:10px; color:#fff; outline:none; margin-top:5px;">
+                </div>
+                <div class="input-group-dash" style="margin-top:14px;">
+                    <label><i class="fa-solid fa-link"></i> OR add by video link (no file upload)</label>
+                    <input type="url" id="adminLinkInput" placeholder="https://... (after unlocking, the visitor is sent to this link)" style="width:100%; padding:14px; background:#070911; border:1px solid #1a2035; border-radius:10px; color:#fff; outline:none; margin-top:5px;">
+                    <select id="adminLinkType" style="width:100%; padding:12px; background:#070911; border:1px solid #1a2035; border-radius:10px; color:#fff; outline:none; margin-top:8px;">
+                        <option value="video">Link type: Video</option>
+                        <option value="image">Link type: Photo</option>
+                    </select>
+                    <div style="font-size:12px; color:#8fa0dd; margin-top:6px;">Link mode: leave the file empty, add a thumbnail (above) + text, then press the upload button.</div>
+                </div>
+                <div id="adminUploadProgress" style="width: 0%; height: 4px; background: #00f0ff; margin-top: 10px; transition: width 0.2s; border-radius: 10px;"></div>
+                <button class="cyber-btn" onclick="window.handleAdminUpload()">Inject to Server</button>
+            </div>
+        </div>
+
+        <div id="files-tab" class="tab-content">
+            <h2><i class="fa-solid fa-folder-open"></i> Central File Core</h2>
+            <p>Monitor, intercept and wipe uploaded database files instantly.</p>
+            <div class="vip-zone">
+                <div style="overflow-x: auto;">
+                    <table class="cyber-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #00f0ff; color: #00f0ff;">
+                                <th style="padding: 12px;">File</th>
+                                <th style="padding: 12px;">Category</th>
+                                <th style="padding: 12px;">Type</th>
+                                <th style="padding: 12px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminFileList">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="security-tab" class="tab-content">
+            <h2><i class="fa-solid fa-shield-halved"></i> Privacy & Access Protocols</h2>
+            <p>Toggle website operational state, visibility, and privacy status.</p>
+            <div class="vip-zone">
+                <div style="overflow-x: auto;">
+                    <table class="cyber-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #ff0055; color: #ff0055;">
+                                <th style="padding: 12px;">File Name</th>
+                                <th style="padding: 12px;">Category</th>
+                                <th style="padding: 12px;">Status</th>
+                                <th style="padding: 12px;">Toggle Visibility</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminPrivacyList">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="private-tab" class="tab-content">
+            <h2><i class="fa-solid fa-user-lock"></i> Private Vault</h2>
+            <p>Only you (logged-in admin) can see this list. Private items are not in the public gallery, search or filters.</p>
+            <div class="vip-zone">
+                <div id="privBackendNote" style="font-size:12px; color:#ff9800; margin-bottom:10px;"></div>
+                <div style="overflow-x: auto;">
+                    <table class="cyber-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                        <thead><tr style="border-bottom: 2px solid #ff0055; color: #ff0055;">
+                            <th style="padding: 12px;">File</th><th style="padding: 12px;">Category</th><th style="padding: 12px;">Type</th><th style="padding: 12px;">Actions</th>
+                        </tr></thead>
+                        <tbody id="adminPrivateList"></tbody>
+                    </table>
+                </div>
+                <div id="privSharePanel" class="cyber-card-inner" style="display:none; margin-top:20px;">
+                    <h4>🔗 Share links — <span id="privShareName"></span></h4>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                        <div><label style="font-size:12px; color:#8fa0dd;">Expires after (hours, 0 = never)</label><input type="number" min="0" id="shareExpiryInput" class="adm-field" value="24"></div>
+                        <div><label style="font-size:12px; color:#8fa0dd;">Max uses (0 = unlimited)</label><input type="number" min="0" id="shareMaxInput" class="adm-field" value="1"></div>
+                    </div>
+                    <button class="cyber-btn" style="margin-top:12px;" onclick="window.createShareLink()">Generate &amp; Copy Private Link</button>
+                    <div id="shareListBox" style="margin-top:14px; font-size:13px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="unlock-tab" class="tab-content">
+            <h2><i class="fa-solid fa-unlock-keyhole"></i> Unlock Settings</h2>
+            <p>How many advertisement steps are required before a photo or video opens.</p>
+            <div class="vip-zone">
+                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                    <div><label style="font-size:12px; color:#8fa0dd;">Photo steps</label><input type="number" min="1" max="20" id="cfgPhotoSteps" class="adm-field" value="3"></div>
+                    <div><label style="font-size:12px; color:#8fa0dd;">Video steps</label><input type="number" min="1" max="30" id="cfgVideoSteps" class="adm-field" value="6"></div>
+                    <div><label style="font-size:12px; color:#8fa0dd;">Access window after unlock (hours)</label><input type="number" min="1" max="720" id="cfgAccessHours" class="adm-field" value="24"></div>
+                    <div><label style="font-size:12px; color:#8fa0dd;">Minimum seconds per step</label><input type="number" min="1" max="120" id="cfgMinStep" class="adm-field" value="5"></div>
+                </div>
+                <p style="font-size:12px; color:#8fa0dd; margin-top:14px;">The ad network for each step (Adsgram / Monetag / Adsterra) is chosen in <b>Ads Manager</b>. "Minimum seconds" is used for the Adsterra direct link: the visitor must stay on the ad page at least that long.</p>
+                <button class="cyber-btn" style="margin-top:14px;" onclick="window.saveUnlockSettings()">💾 Save Unlock Settings</button>
+            </div>
+        </div>
+
+        <div id="notif-tab" class="tab-content">
+            <h2><i class="fa-solid fa-bell"></i> Realtime Notice & RGB Popup Broadcaster</h2>
+            <p>Forcefully push top bar notifications or active popup modals to all visitors.</p>
+            <div class="vip-zone grid-2">
+                <div class="cyber-card-inner">
+                    <h4>📡 Top Bar Notification</h4>
+                    <div class="input-group-dash" style="margin-top: 15px;">
+                        <input type="text" id="adminNoticeInput" placeholder="Enter Scrolling Notice Text...">
+                    </div>
+                    <button class="cyber-btn" onclick="window.broadcastNotice()">Update Notice Bar</button>
+                </div>
+                
+				<div class="admin-sec-card" style="background:#0f172a; border:1px solid rgba(0,240,255,0.2); padding:20px; border-radius:12px; display:flex; flex-direction:column; gap:18px; font-family:sans-serif;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                        <div>
+                            <div class="switch-label" style="color:#fff; font-weight:bold; font-size:14px; letter-spacing:1px;">🛡️ F12 / DevTools BLOCK</div>
+                            <div id="secF12Text" style="font-size:12px; margin-top:5px; font-weight:bold; letter-spacing:1px; color:#ff0055;">STATUS: LOADING...</div>
+                        </div>
+                        <label class="cyber-switch"><input type="checkbox" id="secF12" onchange="saveSecurity()"><span class="cyber-slider"></span></label>
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                        <div>
+                            <div class="switch-label" style="color:#fff; font-weight:bold; font-size:14px; letter-spacing:1px;">🖱️ RIGHT-CLICK BLOCK</div>
+                            <div id="secRCText" style="font-size:12px; margin-top:5px; font-weight:bold; letter-spacing:1px; color:#ff0055;">STATUS: LOADING...</div>
+                        </div>
+                        <label class="cyber-switch"><input type="checkbox" id="secRC" onchange="saveSecurity()"><span class="cyber-slider"></span></label>
+                    </div>
+                </div>
+
+                <div class="cyber-card-inner">
+                    <h4>💥 Active RGB Center Popup</h4>
+                    <div class="input-group-dash" style="margin-top: 15px;">
+                        <textarea id="adminPopupTextInput" rows="2" placeholder="Popup Message Text..."></textarea>
+                    </div>
+                    <div class="input-group-dash" style="margin-top: 10px;">
+                        <input type="text" id="adminPopupLinkInput" placeholder="Optional Action Link (https://...)">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="cyber-btn" onclick="window.broadcastPopup()">Push Popup</button>
+                        <button class="cyber-btn btn-red" onclick="window.deletePopup()">Delete Popup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ads-tab" class="tab-content">
+            <h2><i class="fa-solid fa-rectangle-ad"></i> Ads Manager — Adsgram · Monetag · Adsterra</h2>
+            <p>Pick the network for each ad place. Changes go live on every device instantly. Save, then press ▶ Test inside Telegram.</p>
+
+            <div class="vip-zone" style="display:flex; flex-direction:column; gap:20px;">
+
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:4px;">🔓 Login Unlock Ad</h4>
+                    <p style="font-size:12px; color:#8fa0dd; margin-bottom:12px;">Shown once when a visitor opens the gallery (before anything else).</p>
+                    <label style="font-size:12px; color:#8fa0dd;">Ad Network</label>
+                    <select id="ads_login_provider" class="adm-field" onchange="window.adsProviderChanged('login')">
+                        <option value="adsgram">Adsgram</option>
+                        <option value="monetag">Monetag</option>
+                        <option value="adsterra">Adsterra (Direct Link)</option>
+                        <option value="off">Off (no ad)</option>
+                    </select>
+                    <div id="ads_login_row_adsgram" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsgram Block ID</label>
+                        <input type="text" id="ads_login_adsgram" class="adm-field" placeholder="e.g. 28869">
+                    </div>
+                    <div id="ads_login_row_monetag" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Monetag Zone ID (Block ID)</label>
+                        <input type="text" id="ads_login_monetag" class="adm-field" placeholder="e.g. 1234567">
+                        <select id="ads_login_fmt" class="adm-field">
+                            <option value="int">Format: Rewarded Interstitial</option>
+                            <option value="pop">Format: Rewarded Popup</option>
+                        </select>
+                    </div>
+                    <div id="ads_login_row_adsterra" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsterra Direct Link</label>
+                        <input type="text" id="ads_login_adsterra" class="adm-field" placeholder="https://... (empty = default link)">
+                    </div>
+                    <button id="ads_login_test" class="adm-mini" style="background:#00f0ff; margin:12px 0 0 0; padding:8px 14px;" onclick="window.testAdSlot('login')">▶ Test</button>
+                </div>
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:4px;">🖼️ Content Unlock Ad</h4>
+                    <p style="font-size:12px; color:#8fa0dd; margin-bottom:12px;">Shown for every photo / video unlock step (steps count: Unlock Settings).</p>
+                    <label style="font-size:12px; color:#8fa0dd;">Ad Network</label>
+                    <select id="ads_content_provider" class="adm-field" onchange="window.adsProviderChanged('content')">
+                        <option value="adsgram">Adsgram</option>
+                        <option value="monetag">Monetag</option>
+                        <option value="adsterra">Adsterra (Direct Link)</option>
+                        <option value="off">Off (no ad)</option>
+                    </select>
+                    <div id="ads_content_row_adsgram" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsgram Block ID</label>
+                        <input type="text" id="ads_content_adsgram" class="adm-field" placeholder="e.g. 28869">
+                    </div>
+                    <div id="ads_content_row_monetag" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Monetag Zone ID (Block ID)</label>
+                        <input type="text" id="ads_content_monetag" class="adm-field" placeholder="e.g. 1234567">
+                        <select id="ads_content_fmt" class="adm-field">
+                            <option value="int">Format: Rewarded Interstitial</option>
+                            <option value="pop">Format: Rewarded Popup</option>
+                        </select>
+                    </div>
+                    <div id="ads_content_row_adsterra" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsterra Direct Link</label>
+                        <input type="text" id="ads_content_adsterra" class="adm-field" placeholder="https://... (empty = default link)">
+                    </div>
+                    <button id="ads_content_test" class="adm-mini" style="background:#00f0ff; margin:12px 0 0 0; padding:8px 14px;" onclick="window.testAdSlot('content')">▶ Test</button>
+                </div>
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:4px;">🎁 Optional Bonus Ad</h4>
+                    <p style="font-size:12px; color:#8fa0dd; margin-bottom:12px;">Button under the offer timer. Each watched ad gives the visitor 1 free unlock step (max 3 saved).</p>
+                    <label style="font-size:12px; color:#8fa0dd;">Ad Network</label>
+                    <select id="ads_bonus_provider" class="adm-field" onchange="window.adsProviderChanged('bonus')">
+                        <option value="adsgram">Adsgram</option>
+                        <option value="monetag">Monetag</option>
+                        <option value="adsterra">Adsterra (Direct Link)</option>
+                        <option value="off">Off (no ad)</option>
+                    </select>
+                    <div id="ads_bonus_row_adsgram" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsgram Block ID</label>
+                        <input type="text" id="ads_bonus_adsgram" class="adm-field" placeholder="e.g. 28869">
+                    </div>
+                    <div id="ads_bonus_row_monetag" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Monetag Zone ID (Block ID)</label>
+                        <input type="text" id="ads_bonus_monetag" class="adm-field" placeholder="e.g. 1234567">
+                        <select id="ads_bonus_fmt" class="adm-field">
+                            <option value="int">Format: Rewarded Interstitial</option>
+                            <option value="pop">Format: Rewarded Popup</option>
+                        </select>
+                    </div>
+                    <div id="ads_bonus_row_adsterra" style="margin-top:10px; display:none;">
+                        <label style="font-size:12px; color:#8fa0dd;">Adsterra Direct Link</label>
+                        <input type="text" id="ads_bonus_adsterra" class="adm-field" placeholder="https://... (empty = default link)">
+                    </div>
+                    <button id="ads_bonus_test" class="adm-mini" style="background:#00f0ff; margin:12px 0 0 0; padding:8px 14px;" onclick="window.testAdSlot('bonus')">▶ Test</button>
+                </div>
+
+                <div class="cyber-card-inner" style="border:1px solid rgba(0,240,255,0.2); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:8px;">⚙️ Monetag SDK</h4>
+                    <label style="font-size:12px; color:#8fa0dd;">SDK script URL (the src of the tag from your Monetag dashboard)</label>
+                    <input type="text" id="ads_monetag_sdk" class="adm-field" placeholder="https://libtl.com/sdk.js">
+                </div>
+
+                <button class="cyber-btn" onclick="window.saveAdsSettings()">💾 Save All Ad Settings</button>
+
+                <div class="cyber-card-inner" style="border:1px solid rgba(80,170,255,0.35); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:12px; color:#58b6ff;">✈️ Telegram Bot / Mini App</h4>
+                    <label style="font-size:12px; color:#8fa0dd;">Telegram Bot Token</label>
+                    <input type="password" id="tgBotToken" class="adm-field" autocomplete="off" placeholder="123456789:AA...">
+                    <label style="font-size:12px; color:#8fa0dd; display:block; margin-top:10px;">Bot Username (auto-filled from token)</label>
+                    <input type="text" id="tgBotUser" class="adm-field" placeholder="my_gallery_bot" oninput="window.refreshTgPreview()">
+                    <label style="font-size:12px; color:#8fa0dd; display:block; margin-top:10px;">Mini App short name (optional — from BotFather /newapp; empty = main Mini App)</label>
+                    <input type="text" id="tgAppName" class="adm-field" placeholder="gallery" oninput="window.refreshTgPreview()">
+                    <div id="tgLinkPreview" style="font-size:12px; color:#8fa0dd; margin-top:8px; word-break:break-all;"></div>
+                    <button class="cyber-btn" style="margin-top:14px;" onclick="window.saveTelegramSettings()">💾 Save Telegram Settings</button>
+                </div>
+
+                <!-- Developer Website Link -->
+                <div class="cyber-card-inner" style="border:1px solid rgba(255,204,0,0.3); border-radius:14px; padding:20px;">
+                    <h4 style="margin-bottom:12px; color:#ffcc00;">🌐 Developer Button Link (Sidebar)</h4>
+                    <div class="input-group-dash">
+                        <label style="font-size:12px; color:#8fa0dd;">Your Website URL</label>
+                        <input type="text" id="devWebsiteInput" placeholder="https://yourwebsite.com" style="width:100%;padding:10px;background:#070911;border:1px solid #1a2035;border-radius:8px;color:#fff;outline:none;margin-top:5px;">
+                    </div>
+                    <div class="input-group-dash" style="margin-top:10px;">
+                        <label style="font-size:12px; color:#8fa0dd;">Button Label</label>
+                        <input type="text" id="devBtnLabelInput" placeholder="e.g. My Portfolio 🌟" style="width:100%;padding:10px;background:#070911;border:1px solid #1a2035;border-radius:8px;color:#fff;outline:none;margin-top:5px;">
+                    </div>
+                    <button class="cyber-btn" style="margin-top:14px; background:linear-gradient(45deg,#ffcc00,#ff8c00); color:#000;" onclick="window.saveDevWebsite()">💾 Save Developer Link</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="update-tab" class="tab-content">
+            <div class="coming-soon-box">
+                <div class="glitch-text" data-text="VERSION 2.0">VERSION 2.0</div>
+                <h2>SYSTEM UPDATE COMING SOON</h2>
+                <!-- Animated Developer Profile Picture -->
+                <div style="margin:18px auto; position:relative; width:90px; height:90px;">
+                    <div style="position:absolute; inset:-4px; border-radius:50%; background:conic-gradient(#00ffcc, #7c3aed, #ff0080, #00ccff, #00ffcc); animation:rotateRGB 3s linear infinite; z-index:0;"></div>
+                    <div style="position:absolute; inset:2px; border-radius:50%; background:#0b0b1a; z-index:1;"></div>
+                    <img src="https://res.cloudinary.com/sabbir-img-upload/image/upload/v1781843393/dkrkwkjewktzpntnqsxb.png"
+                        alt="Developer"
+                        style="position:absolute; inset:4px; width:calc(100% - 8px); height:calc(100% - 8px); border-radius:50%; object-fit:cover; z-index:2; animation:devImgFloat 3s ease-in-out infinite;">
+                </div>
+                <style>
+                @keyframes devImgFloat {
+                    0%,100% { transform:translateY(0) scale(1); box-shadow:0 0 0 0 rgba(0,255,204,0.4); }
+                    50% { transform:translateY(-5px) scale(1.04); box-shadow:0 8px 20px rgba(0,255,204,0.3); }
+                }
+                </style>
+				<a href="https://www.facebook.com/Sabbir7xa" target="_blank" class="dev-watermark" title="Visit Developer Profile">Dev X Sabbir</a>
+                <div class="loader-bar"><div></div></div>
+                <p>AI Automated Threat Detection, Bypass Firewalls, and Multi-Cloud Mirroring features are currently compiling in the shadows...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="admin.js"></script>
+
+</body>
+</html>
